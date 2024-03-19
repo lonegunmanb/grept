@@ -154,7 +154,7 @@ func (s *localExecFixSuite) TestLocalExecShell_CommandValidate() {
 	}
 	for _, c := range cases {
 		s.Run(c.desc, func() {
-			err := validate.Struct(*c.f)
+			err := Validate.Struct(*c.f)
 			if c.wantError {
 				assert.Error(s.T(), err)
 			} else {

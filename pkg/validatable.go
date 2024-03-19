@@ -9,14 +9,14 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate = validator.New(validator.WithRequiredStructEnabled())
+var Validate = validator.New(validator.WithRequiredStructEnabled())
 
 func registerValidator() {
-	_ = validate.RegisterValidation("conflict_with", validateConflictWith)
-	_ = validate.RegisterValidation("at_least_one_of", validateAtLeastOneOf)
-	_ = validate.RegisterValidation("required_with", validateRequiredWith)
-	_ = validate.RegisterValidation("all_string_in_slice", validateAllStringInSlice)
-	_ = validate.RegisterValidation("file_mode", validateFileMode)
+	_ = Validate.RegisterValidation("conflict_with", validateConflictWith)
+	_ = Validate.RegisterValidation("at_least_one_of", validateAtLeastOneOf)
+	_ = Validate.RegisterValidation("required_with", validateRequiredWith)
+	_ = Validate.RegisterValidation("all_string_in_slice", validateAllStringInSlice)
+	_ = Validate.RegisterValidation("file_mode", validateFileMode)
 }
 
 type Validatable interface {
