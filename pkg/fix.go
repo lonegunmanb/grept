@@ -50,6 +50,8 @@ func (bf *BaseFix) GetRuleIds() []string {
 	return bf.RuleIds
 }
 
+func (bf *BaseFix) AddressLength() int { return 3 }
+
 func (bf *BaseFix) setRuleIds(ids []string) {
 	bf.RuleIds = ids
 }

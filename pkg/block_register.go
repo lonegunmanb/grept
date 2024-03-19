@@ -13,6 +13,7 @@ type blockConstructor = func(Config, *hclBlock) Block
 type blockRegistry map[string]blockConstructor
 
 var validBlockTypes sets.Set = hashset.New()
+var refIters = map[string]refIterator{}
 
 var baseFactory = map[string]func() any{}
 
@@ -29,6 +30,10 @@ func RegisterBlock(t Block) {
 	if !ok {
 		registry = make(blockRegistry)
 		factories[bt] = registry
+	}
+	_, ok = refIters[bt]
+	if !ok {
+		refIters[bt] = iterator(bt, t.AddressLength())
 	}
 	validBlockTypes.Add(bt)
 	registry[t.Type()] = func(c Config, hb *hclBlock) Block {

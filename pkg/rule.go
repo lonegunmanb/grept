@@ -22,6 +22,8 @@ func (br *BaseRule) CheckError() error {
 
 func (br *BaseRule) Rule() {}
 
+func (br *BaseRule) AddressLength() int { return 3 }
+
 func (br *BaseRule) setCheckError(err error) {
 	br.checkErr = err
 }

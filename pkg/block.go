@@ -30,6 +30,7 @@ type Block interface {
 	Values() map[string]cty.Value
 	BaseValues() map[string]cty.Value
 	PreConditionCheck(*hcl.EvalContext) ([]PreCondition, error)
+	AddressLength() int
 	forEachDefined() bool
 	getDownstreams() []Block
 	setForEach(*forEach)

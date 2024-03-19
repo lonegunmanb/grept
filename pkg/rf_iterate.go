@@ -9,18 +9,7 @@ import (
 
 type refIterator func(t []hcl.Traverser, i int) []string
 
-var refIters = map[string]refIterator{
-	"data":  dataIterator,
-	"rule":  ruleIterator,
-	"fix":   fixIterator,
-	"local": localIterator,
-}
-
-var localIterator = iterator("local", 2)
-var dataIterator = iterator("data", 3)
-var ruleIterator = iterator("rule", 3)
-var fixIterator = iterator("fix", 3)
-
+// iterator return a refIterator that travel a list of tokens, and return referenced block's address inside this expression
 func iterator(keyword string, addressLength int) refIterator {
 	return func(ts []hcl.Traverser, i int) []string {
 		var r []string
@@ -35,6 +24,7 @@ func iterator(keyword string, addressLength int) refIterator {
 		}
 		remain := addressLength
 		sb := strings.Builder{}
+		// data.xyz.abc
 		for j := i; remain > 0; j++ {
 			sb.WriteString(name(ts[j]))
 			remain--
@@ -43,7 +33,7 @@ func iterator(keyword string, addressLength int) refIterator {
 			}
 		}
 		r = []string{sb.String()}
-		//potential index
+		//potential index, like data.xyz.abc["foo"]
 		if len(ts) > i+addressLength+1 {
 			index, ok := ts[i+addressLength].(hcl.TraverseIndex)
 			if ok {

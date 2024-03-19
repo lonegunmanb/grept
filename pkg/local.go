@@ -33,12 +33,4 @@ func (l *LocalBlock) Values() map[string]cty.Value {
 
 func (l *LocalBlock) Local() {}
 
-//func (l *LocalBlock) decode(b *hclsyntax.Body, ctx *hcl.EvalContext) error {
-//	for _, attr := range b.Attributes {
-//		v, diag := attr.Expr.Value(ctx)
-//		if diag.HasErrors() {
-//			return diag
-//		}
-//
-//	}
-//}
+func (l *LocalBlock) AddressLength() int { return 2 }
