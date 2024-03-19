@@ -1,11 +1,11 @@
 package pkg
 
 func init() {
+	registerLocal()
+	registerValidator()
 	registerRule()
 	registerFix()
 	registerData()
-	registerLocal()
-	registerValidator()
 	RegisterBaseBlock(func() BlockType {
 		return new(BaseRule)
 	})

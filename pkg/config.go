@@ -52,20 +52,6 @@ func (c *BaseConfig) SetDag(d *Dag) {
 	c.dag = d
 }
 
-type GreptConfig struct {
-	*BaseConfig
-}
-
-func (g *GreptConfig) IgnoreUnsupportedBlock() bool {
-	return false
-}
-
-func NewGreptConfig() *GreptConfig {
-	return &GreptConfig{
-		BaseConfig: NewBasicConfig(),
-	}
-}
-
 func Blocks[T Block](c IDag) []T {
 	var r []T
 	for _, b := range c.Dag().GetVertices() {
