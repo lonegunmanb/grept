@@ -16,6 +16,10 @@ import (
 	"strings"
 )
 
+type BlockType interface {
+	BlockType() string
+}
+
 type block interface {
 	Id() string
 	Name() string

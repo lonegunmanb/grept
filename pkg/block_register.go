@@ -10,19 +10,21 @@ import (
 type blockConstructor = func(*Config, *hclBlock) block
 type blockRegistry map[string]blockConstructor
 
-var baseFactory = map[string]func() any{
-	"rule": func() any {
-		return new(BaseRule)
-	},
-	"fix": func() any {
-		return new(BaseFix)
-	},
-	"data": func() any {
-		return new(BaseData)
-	},
+var baseFactory = map[string]func() any{}
+
+func RegisterBaseBlock(factory func() BlockType) {
+	bb := factory()
+	baseFactory[bb.BlockType()] = func() any {
+		return factory()
+	}
 }
 
-func registerFunc(registry blockRegistry, t block) {
+func RegisterBlock(t block) {
+	registry, ok := factories[t.BlockType()]
+	if !ok {
+		registry = make(blockRegistry)
+		factories[t.BlockType()] = registry
+	}
 	registry[t.Type()] = func(c *Config, hb *hclBlock) block {
 		newBlock := reflect.New(reflect.TypeOf(t).Elem()).Elem()
 		newBaseBlock := newBaseBlock(c, hb)
@@ -38,42 +40,30 @@ func registerFunc(registry blockRegistry, t block) {
 	}
 }
 
-var localFactories = make(blockRegistry)
-
 func registerLocal() {
-	registerFunc(localFactories, new(LocalBlock))
+	RegisterBlock(new(LocalBlock))
 }
 
-var factories = map[string]blockRegistry{
-	"data":  datasourceFactories,
-	"rule":  ruleFactories,
-	"fix":   fixFactories,
-	"local": localFactories,
-}
-var fixFactories = make(blockRegistry)
+var factories = map[string]blockRegistry{}
 
 func registerFix() {
-	registerFunc(fixFactories, new(CopyFileFix))
-	registerFunc(fixFactories, new(LocalFileFix))
-	registerFunc(fixFactories, new(RenameFileFix))
-	registerFunc(fixFactories, new(RmLocalFileFix))
-	registerFunc(fixFactories, new(LocalShellFix))
-	registerFunc(fixFactories, new(GitIgnoreFix))
-	registerFunc(fixFactories, new(YamlTransformFix))
+	RegisterBlock(new(CopyFileFix))
+	RegisterBlock(new(LocalFileFix))
+	RegisterBlock(new(RenameFileFix))
+	RegisterBlock(new(RmLocalFileFix))
+	RegisterBlock(new(LocalShellFix))
+	RegisterBlock(new(GitIgnoreFix))
+	RegisterBlock(new(YamlTransformFix))
 }
-
-var ruleFactories = make(blockRegistry)
 
 func registerRule() {
-	registerFunc(ruleFactories, new(FileExistRule))
-	registerFunc(ruleFactories, new(FileHashRule))
-	registerFunc(ruleFactories, new(MustBeTrueRule))
-	registerFunc(ruleFactories, new(DirExistRule))
+	RegisterBlock(new(FileExistRule))
+	RegisterBlock(new(FileHashRule))
+	RegisterBlock(new(MustBeTrueRule))
+	RegisterBlock(new(DirExistRule))
 }
 
-var datasourceFactories = make(blockRegistry)
-
 func registerData() {
-	registerFunc(datasourceFactories, new(HttpDatasource))
-	registerFunc(datasourceFactories, new(GitIgnoreDatasource))
+	RegisterBlock(new(HttpDatasource))
+	RegisterBlock(new(GitIgnoreDatasource))
 }

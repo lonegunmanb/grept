@@ -6,4 +6,13 @@ func init() {
 	registerData()
 	registerLocal()
 	registerValidator()
+	RegisterBaseBlock(func() BlockType {
+		return new(BaseRule)
+	})
+	RegisterBaseBlock(func() BlockType {
+		return new(BaseData)
+	})
+	RegisterBaseBlock(func() BlockType {
+		return new(BaseFix)
+	})
 }
