@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/emirpasic/gods/queues/linkedlistqueue"
 	"github.com/emirpasic/gods/sets"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/hashicorp/go-multierror"
@@ -46,4 +47,59 @@ func (d *Dag) addEdge(from, to string) error {
 	}
 	set.Add(from)
 	return nil
+}
+
+func (d *Dag) runDag(c *Config, onReady func(*Config, *Dag, *linkedlistqueue.Queue, Block) error) error {
+	var err error
+	visited := hashset.New()
+	pending := linkedlistqueue.New()
+	for _, n := range d.GetRoots() {
+		pending.Enqueue(n.(Block))
+	}
+	for !pending.Empty() {
+		next, _ := pending.Dequeue()
+		b := next.(Block)
+		// the node has already been expanded and deleted from dag
+		address := blockAddress(b.HclBlock())
+		exist := d.exist(address)
+		if !exist {
+			continue
+		}
+		ancestors, dagErr := d.GetAncestors(address)
+		if dagErr != nil {
+			return dagErr
+		}
+		ready := true
+		for upstreamAddress := range ancestors {
+			if !visited.Contains(upstreamAddress) {
+				ready = false
+			}
+		}
+		if !ready {
+			continue
+		}
+		if callbackErr := onReady(c, d, pending, b); callbackErr != nil {
+			err = multierror.Append(err, callbackErr)
+		}
+		visited.Add(address)
+		// this address might be expanded during onReady and no more exist.
+		exist = d.exist(address)
+		if !exist {
+			continue
+		}
+		children, dagErr := d.GetChildren(address)
+		if dagErr != nil {
+			return dagErr
+		}
+		for _, n := range children {
+			pending.Enqueue(n)
+		}
+	}
+	return err
+}
+
+func (d *Dag) exist(address string) bool {
+	n, existErr := d.GetVertex(address)
+	notExist := n == nil || existErr != nil
+	return !notExist
 }

@@ -3,7 +3,6 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"github.com/emirpasic/gods/queues/linkedlistqueue"
 	"path/filepath"
 
 	"github.com/ahmetb/go-linq/v3"
@@ -130,61 +129,6 @@ func (c *Config) Plan() (*GreptPlan, error) {
 	}
 
 	return plan, nil
-}
-
-func (dag *Dag) runDag(c *Config, onReady func(*Config, *Dag, *linkedlistqueue.Queue, Block) error) error {
-	var err error
-	visited := hashset.New()
-	pending := linkedlistqueue.New()
-	for _, n := range dag.GetRoots() {
-		pending.Enqueue(n.(Block))
-	}
-	for !pending.Empty() {
-		next, _ := pending.Dequeue()
-		b := next.(Block)
-		// the node has already been expanded and deleted from dag
-		address := blockAddress(b.HclBlock())
-		exist := dag.exist(address)
-		if !exist {
-			continue
-		}
-		ancestors, dagErr := dag.GetAncestors(address)
-		if dagErr != nil {
-			return dagErr
-		}
-		ready := true
-		for upstreamAddress := range ancestors {
-			if !visited.Contains(upstreamAddress) {
-				ready = false
-			}
-		}
-		if !ready {
-			continue
-		}
-		if callbackErr := onReady(c, dag, pending, b); callbackErr != nil {
-			err = multierror.Append(err, callbackErr)
-		}
-		visited.Add(address)
-		// this address might be expanded during onReady and no more exist.
-		exist = dag.exist(address)
-		if !exist {
-			continue
-		}
-		children, dagErr := dag.GetChildren(address)
-		if dagErr != nil {
-			return dagErr
-		}
-		for _, n := range children {
-			pending.Enqueue(n)
-		}
-	}
-	return err
-}
-
-func (d *Dag) exist(address string) bool {
-	n, existErr := d.GetVertex(address)
-	notExist := n == nil || existErr != nil
-	return !notExist
 }
 
 func planBlock(b Block) error {
