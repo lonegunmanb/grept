@@ -10,12 +10,12 @@ import (
 func TestPlan_String(t *testing.T) {
 	tests := []struct {
 		name string
-		plan *Plan
+		plan *GreptPlan
 		want []string
 	}{
 		{
 			name: "Test Plan String",
-			plan: &Plan{
+			plan: &GreptPlan{
 				FailedRules: []*FailedRule{
 					{
 						Rule: &FileHashRule{

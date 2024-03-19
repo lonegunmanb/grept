@@ -106,7 +106,7 @@ func newConfig(baseDir string, ctx context.Context, hclBlocks []*hclBlock, err e
 	return config, nil
 }
 
-func (c *Config) Plan() (*Plan, error) {
+func (c *Config) Plan() (*GreptPlan, error) {
 	err := c.dag.runDag(c, plan)
 	if err != nil {
 		return nil, err

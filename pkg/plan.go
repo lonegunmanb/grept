@@ -7,19 +7,26 @@ import (
 	"sync"
 )
 
-type Plan struct {
+type Plan interface {
+	String() string
+	Apply() error
+}
+
+var _ Plan = &GreptPlan{}
+
+type GreptPlan struct {
 	FailedRules []*FailedRule
 	Fixes       map[string]Fix
 	mu          sync.Mutex
 }
 
-func newPlan() *Plan {
-	return &Plan{
+func newPlan() *GreptPlan {
+	return &GreptPlan{
 		Fixes: make(map[string]Fix),
 	}
 }
 
-func (p *Plan) String() string {
+func (p *GreptPlan) String() string {
 	sb := strings.Builder{}
 	for _, r := range p.FailedRules {
 		sb.WriteString(r.String())
@@ -33,7 +40,7 @@ func (p *Plan) String() string {
 	return sb.String()
 }
 
-func (p *Plan) Apply() error {
+func (p *GreptPlan) Apply() error {
 	var err error
 	for _, fix := range p.Fixes {
 		if err = decode(fix); err != nil {
@@ -55,13 +62,13 @@ func (p *Plan) Apply() error {
 	return nil
 }
 
-func (p *Plan) addRule(fr *FailedRule) {
+func (p *GreptPlan) addRule(fr *FailedRule) {
 	p.mu.Lock()
 	p.FailedRules = append(p.FailedRules, fr)
 	p.mu.Unlock()
 }
 
-func (p *Plan) addFix(f Fix) {
+func (p *GreptPlan) addFix(f Fix) {
 	p.mu.Lock()
 	p.Fixes[f.Id()] = f
 	p.mu.Unlock()
