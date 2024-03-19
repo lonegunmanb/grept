@@ -35,7 +35,7 @@ func (s *fixRmLocalFileSuite) TestRemoveFile_FileExist() {
 	fileName := tmpFile.Name()
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{},
+			c: &BaseConfig{},
 		},
 		Paths: []string{fileName},
 	}
@@ -52,7 +52,7 @@ func (s *fixRmLocalFileSuite) TestRemoveFile_FileNotExist() {
 	fileName := "/path/to/not-exist-file"
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{},
+			c: &BaseConfig{},
 		},
 		Paths: []string{fileName},
 	}
@@ -72,7 +72,7 @@ func TestRemoveFile_RemoveFolder(t *testing.T) {
 	require.NoError(t, err)
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{},
+			c: &BaseConfig{},
 		},
 		Paths: []string{tmpDir},
 	}

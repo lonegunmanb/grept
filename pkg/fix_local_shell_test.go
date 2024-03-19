@@ -194,7 +194,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_Inlines() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &Config{
+			c: &BaseConfig{
 				ctx: context.TODO(),
 			},
 		},
@@ -235,7 +235,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_script() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &Config{
+			c: &BaseConfig{
 				ctx: context.TODO(),
 			},
 		},
@@ -273,7 +273,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_RemoteScript() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &Config{
+			c: &BaseConfig{
 				ctx: context.TODO(),
 			},
 		},

@@ -49,7 +49,7 @@ func (d *Dag) addEdge(from, to string) error {
 	return nil
 }
 
-func (d *Dag) runDag(c *Config, onReady func(*Config, *Dag, *linkedlistqueue.Queue, Block) error) error {
+func (d *Dag) runDag(c *BaseConfig, onReady func(*BaseConfig, *Dag, *linkedlistqueue.Queue, Block) error) error {
 	var err error
 	visited := hashset.New()
 	pending := linkedlistqueue.New()

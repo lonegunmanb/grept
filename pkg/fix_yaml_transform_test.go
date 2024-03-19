@@ -97,7 +97,7 @@ jobs:
 	y.dummyFsWithFiles([]string{yamlPath}, []string{yamlContent})
 	sut := &YamlTransformFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{
+			c: &BaseConfig{
 				ctx: context.TODO(),
 			},
 			name: "test",

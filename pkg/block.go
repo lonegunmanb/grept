@@ -175,7 +175,7 @@ func blockAddress(b *hclBlock) string {
 }
 
 type BaseBlock struct {
-	c             *Config
+	c             Config
 	hb            *hclBlock
 	name          string
 	id            string
@@ -184,7 +184,7 @@ type BaseBlock struct {
 	preConditions []PreCondition
 }
 
-func newBaseBlock(c *Config, hb *hclBlock) *BaseBlock {
+func newBaseBlock(c Config, hb *hclBlock) *BaseBlock {
 	bb := &BaseBlock{
 		c:            c,
 		hb:           hb,
@@ -241,7 +241,7 @@ func (bb *BaseBlock) Context() context.Context {
 	if bb.c == nil {
 		return context.TODO()
 	}
-	return bb.c.ctx
+	return bb.c.Context()
 }
 
 func (bb *BaseBlock) PreConditionCheck(ctx *hcl.EvalContext) ([]PreCondition, error) {
@@ -267,7 +267,7 @@ func (bb *BaseBlock) forEachDefined() bool {
 
 func (bb *BaseBlock) getDownstreams() []Block {
 	var blocks []Block
-	children, _ := bb.c.dag.GetChildren(bb.blockAddress)
+	children, _ := bb.c.Dag().GetChildren(bb.blockAddress)
 	for _, c := range children {
 		blocks = append(blocks, c.(Block))
 	}
@@ -291,12 +291,12 @@ func (bb *BaseBlock) setMetaNestedBlock() {
 	}
 }
 
-func plan(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func plan(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	self, _ := dag.GetVertex(blockAddress(b.HclBlock()))
 	return planBlock(self.(Block))
 }
 
-func tryEvalLocal(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func tryEvalLocal(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	l, ok := b.(*LocalBlock)
 	if !ok {
 		return nil
@@ -308,7 +308,7 @@ func tryEvalLocal(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error 
 	return nil
 }
 
-func expandBlocks(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func expandBlocks(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	attr, ok := b.HclBlock().Body.Attributes["for_each"]
 	if !ok || b.getForEach() != nil {
 		return nil

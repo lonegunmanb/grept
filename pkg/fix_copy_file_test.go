@@ -28,7 +28,7 @@ func (s *copyFileFixSuite) TestCopyFileFix() {
 	s.dummyFsWithFiles([]string{"/example/test"}, []string{"hello world"})
 	sut := &CopyFileFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{
+			c: &BaseConfig{
 				ctx: context.TODO(),
 			},
 			name: "test",

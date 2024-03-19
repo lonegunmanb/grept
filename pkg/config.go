@@ -14,13 +14,29 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-type Config struct {
+type Config interface {
+	Context() context.Context
+	EvalContext() *hcl.EvalContext
+	Dag() *Dag
+}
+
+var _ Config = &BaseConfig{}
+
+type BaseConfig struct {
 	ctx     context.Context
 	basedir string
 	dag     *Dag
 }
 
-func Blocks[T Block](c *Config) []T {
+func (c *BaseConfig) Context() context.Context {
+	return c.ctx
+}
+
+type GreptConfig struct {
+	*BaseConfig
+}
+
+func Blocks[T Block](c *BaseConfig) []T {
 	var r []T
 	for _, b := range c.dag.GetVertices() {
 		t, ok := b.(T)
@@ -31,7 +47,11 @@ func Blocks[T Block](c *Config) []T {
 	return r
 }
 
-func (c *Config) EvalContext() *hcl.EvalContext {
+func (c *BaseConfig) Dag() *Dag {
+	return c.dag
+}
+
+func (c *BaseConfig) EvalContext() *hcl.EvalContext {
 	return &hcl.EvalContext{
 		Functions: hclfuncs.Functions(c.basedir),
 		Variables: map[string]cty.Value{
@@ -42,14 +62,14 @@ func (c *Config) EvalContext() *hcl.EvalContext {
 	}
 }
 
-func newEmptyConfig() *Config {
-	c := &Config{
+func newEmptyConfig() *BaseConfig {
+	c := &BaseConfig{
 		ctx: context.TODO(),
 	}
 	return c
 }
 
-func NewConfig(baseDir, cfgDir string, ctx context.Context) (*Config, error) {
+func NewConfig(baseDir, cfgDir string, ctx context.Context) (*BaseConfig, error) {
 	var err error
 	hclBlocks, err := loadHclBlocks(cfgDir)
 	if err != nil {
@@ -63,7 +83,7 @@ func NewConfig(baseDir, cfgDir string, ctx context.Context) (*Config, error) {
 	return c, nil
 }
 
-func newConfig(baseDir string, ctx context.Context, hclBlocks []*hclBlock, err error) (*Config, error) {
+func newConfig(baseDir string, ctx context.Context, hclBlocks []*hclBlock, err error) (*BaseConfig, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -101,7 +121,7 @@ func newConfig(baseDir string, ctx context.Context, hclBlocks []*hclBlock, err e
 	return config, nil
 }
 
-func (c *Config) Plan() (*GreptPlan, error) {
+func (c *BaseConfig) Plan() (*GreptPlan, error) {
 	err := c.dag.runDag(c, plan)
 	if err != nil {
 		return nil, err
@@ -162,7 +182,7 @@ func planBlock(b Block) error {
 	return nil
 }
 
-func wrapBlock(c *Config, hb *hclBlock) (Block, error) {
+func wrapBlock(c *BaseConfig, hb *hclBlock) (Block, error) {
 	blockFactories := factories[hb.Type]
 	blockType := ""
 	if len(hb.Labels) > 0 {
@@ -247,7 +267,7 @@ func readRawHclBlock(b *hclsyntax.Block) []*hclsyntax.Block {
 	return newBlocks
 }
 
-func (c *Config) blocks() []Block {
+func (c *BaseConfig) blocks() []Block {
 	var blocks []Block
 	for _, n := range c.dag.GetVertices() {
 		blocks = append(blocks, n.(Block))

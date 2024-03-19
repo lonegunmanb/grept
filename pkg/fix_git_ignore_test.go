@@ -28,7 +28,7 @@ func (s *gitIgnoreFixSuite) TestApplyGitIgnoreFix() {
 
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{basedir: "."},
+			c: &BaseConfig{basedir: "."},
 		},
 		Exist:    []string{"new_content"},
 		NotExist: []string{"old_content"},
@@ -49,7 +49,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFixEnsureExist() {
 
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{basedir: "."},
+			c: &BaseConfig{basedir: "."},
 		},
 		Exist: []string{"new_content"},
 	}
@@ -72,7 +72,7 @@ content
 
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{basedir: "."},
+			c: &BaseConfig{basedir: "."},
 		},
 		NotExist: []string{"content"},
 	}
@@ -92,7 +92,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_TrimItem() {
 
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{basedir: "."},
+			c: &BaseConfig{basedir: "."},
 		},
 		Exist:    []string{" new_content\t\n", "another_content\r\n"},
 		NotExist: []string{".terraform"},
@@ -114,7 +114,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_TrimItem() {
 func (s *gitIgnoreFixSuite) TestGitIgnoreFix_GitIgnoreFileAbsent() {
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
-			c: &Config{basedir: "."},
+			c: &BaseConfig{basedir: "."},
 		},
 		Exist:    []string{"content"},
 		NotExist: []string{"new_content"},

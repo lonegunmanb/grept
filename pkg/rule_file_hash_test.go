@@ -156,7 +156,7 @@ func (s *fileHashRuleSuite) TestFileHashRule_HashMismatchFilesShouldBeExported()
 	_ = afero.WriteFile(fs, filename, []byte("test content"), 0644)
 	rule := &FileHashRule{
 		BaseBlock: &BaseBlock{
-			c: &Config{},
+			c: &BaseConfig{},
 		},
 		BaseRule: new(BaseRule),
 		Glob:     "/example/*/testfile.txt",
