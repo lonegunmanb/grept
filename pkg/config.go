@@ -6,8 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/ahmetb/go-linq/v3"
-	"github.com/emirpasic/gods/sets"
-	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -15,8 +13,6 @@ import (
 	"github.com/spf13/afero"
 	"github.com/zclconf/go-cty/cty"
 )
-
-var validBlockTypes sets.Set = hashset.New("data", "rule", "fix", "local")
 
 type Config struct {
 	ctx     context.Context

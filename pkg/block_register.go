@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"github.com/emirpasic/gods/sets"
+	"github.com/emirpasic/gods/sets/hashset"
 	"reflect"
 
 	"golang.org/x/text/cases"
@@ -9,6 +11,8 @@ import (
 
 type blockConstructor = func(*Config, *hclBlock) Block
 type blockRegistry map[string]blockConstructor
+
+var validBlockTypes sets.Set = hashset.New()
 
 var baseFactory = map[string]func() any{}
 
@@ -20,11 +24,13 @@ func RegisterBaseBlock(factory func() BlockType) {
 }
 
 func RegisterBlock(t Block) {
-	registry, ok := factories[t.BlockType()]
+	bt := t.BlockType()
+	registry, ok := factories[bt]
 	if !ok {
 		registry = make(blockRegistry)
-		factories[t.BlockType()] = registry
+		factories[bt] = registry
 	}
+	validBlockTypes.Add(bt)
 	registry[t.Type()] = func(c *Config, hb *hclBlock) Block {
 		newBlock := reflect.New(reflect.TypeOf(t).Elem()).Elem()
 		newBaseBlock := newBaseBlock(c, hb)
@@ -32,8 +38,8 @@ func RegisterBlock(t Block) {
 		newBaseBlock.setMetaNestedBlock()
 		newBlock.FieldByName("BaseBlock").Set(reflect.ValueOf(newBaseBlock))
 		b := newBlock.Addr().Interface().(Block)
-		if f, ok := baseFactory[t.BlockType()]; ok {
-			blockName := cases.Title(language.English).String(t.BlockType())
+		if f, ok := baseFactory[bt]; ok {
+			blockName := cases.Title(language.English).String(bt)
 			newBlock.FieldByName("Base" + blockName).Set(reflect.ValueOf(f()))
 		}
 		return b
