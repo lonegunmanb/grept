@@ -44,12 +44,12 @@ func applyFunc(auto *bool) func(*cobra.Command, []string) error {
 		if err != nil {
 			return fmt.Errorf("error getting os wd: %+v", err)
 		}
-		config, err := pkg.NewConfig(pwd, configPath, c.Context())
+		config, err := pkg.LoadConfig(pkg.NewGreptConfig(), pwd, configPath, c.Context())
 		if err != nil {
 			return fmt.Errorf("error parsing config: %s\n", err.Error())
 		}
 
-		plan, err := config.Plan()
+		plan, err := pkg.RunGreptPlan(config)
 		if err != nil {
 			return fmt.Errorf("Error generating plan: %s\n", err.Error())
 		}

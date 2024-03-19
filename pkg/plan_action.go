@@ -1,5 +1,5 @@
 package pkg
 
-type planAction interface {
+type PlanBlock interface {
 	ExecuteDuringPlan() error
 }

@@ -34,9 +34,9 @@ locals {
 }
 `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{code})
-	c, err := NewConfig("/", "", nil)
+	c, err := LoadConfig(NewGreptConfig(), "/", "", nil)
 	s.NoError(err)
-	_, err = c.Plan()
+	_, err = RunGreptPlan(c)
 	s.NoError(err)
 	var locals []Local
 	linq.From(Blocks[Local](c)).OrderBy(func(i interface{}) interface{} {

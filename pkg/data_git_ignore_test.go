@@ -32,7 +32,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_Load() {
 	// create GitIgnoreDatasource instance and load .gitignore content
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: &BaseConfig{},
+			c: NewGreptConfig(),
 		},
 	}
 
@@ -51,7 +51,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_NoGitIgnoreFile() {
 	// create GitIgnoreDatasource instance and load .gitignore content
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: &BaseConfig{},
+			c: NewGreptConfig(),
 		},
 	}
 
@@ -66,7 +66,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_TabSpaceNewLine() {
 
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: &BaseConfig{},
+			c: NewGreptConfig(),
 		},
 	}
 	err := gitIgnore.ExecuteDuringPlan()

@@ -194,9 +194,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_Inlines() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &BaseConfig{
-				ctx: context.TODO(),
-			},
+			c:    NewGreptConfig(),
 		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		Inlines:        []string{`echo "Hello, World!"`},
@@ -235,9 +233,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_script() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &BaseConfig{
-				ctx: context.TODO(),
-			},
+			c:    NewGreptConfig(),
 		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		Script:         tmpScript.Name(),
@@ -273,9 +269,7 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_RemoteScript() {
 		BaseBlock: &BaseBlock{
 			id:   "test",
 			name: "test",
-			c: &BaseConfig{
-				ctx: context.TODO(),
-			},
+			c:    NewGreptConfig(),
 		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		RemoteScript:   fmt.Sprintf("%s/test.sh", ts.URL),
@@ -325,9 +319,9 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix() {
 	}
 `, temp.Name(), temp.Name())
 	s.dummyFsWithFiles([]string{"/example/test.grept.hcl"}, []string{hcl})
-	config, err := NewConfig("", "/example", context.TODO())
+	config, err := LoadConfig(NewGreptConfig(), "", "/example", context.TODO())
 	require.NoError(t, err)
-	plan, err := config.Plan()
+	plan, err := RunGreptPlan(config)
 	require.NoError(t, err)
 	err = plan.Apply()
 	require.NoError(t, err)
@@ -378,9 +372,9 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_UserAssignedEnvShouldBeLo
 	}
 `, temp0.Name(), temp1.Name())
 	s.dummyFsWithFiles([]string{"/example/test.grept.hcl"}, []string{hcl})
-	config, err := NewConfig("", "/example", context.TODO())
+	config, err := LoadConfig(NewGreptConfig(), "", "/example", context.TODO())
 	require.NoError(t, err)
-	plan, err := config.Plan()
+	plan, err := RunGreptPlan(config)
 	require.NoError(t, err)
 	err = plan.Apply()
 	require.NoError(t, err)
@@ -425,9 +419,9 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_scriptWithUserAssignedEnv
 	}
 `, tmpScript.Name(), rand)
 	s.dummyFsWithFiles([]string{"/example/test.grept.hcl"}, []string{hcl})
-	config, err := NewConfig("", "/example", context.TODO())
+	config, err := LoadConfig(NewGreptConfig(), "", "/example", context.TODO())
 	require.NoError(t, err)
-	plan, err := config.Plan()
+	plan, err := RunGreptPlan(config)
 	require.NoError(t, err)
 	err = plan.Apply()
 	require.NoError(t, err)

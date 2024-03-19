@@ -95,9 +95,9 @@ func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Eval() {
 	}
 `, filepath.ToSlash(temp.Name()))), 0644)
 
-	c, err := NewConfig("/", "/", context.TODO())
+	c, err := LoadConfig(NewGreptConfig(), "/", "/", context.TODO())
 	require.NoError(t, err)
-	plan, err := c.Plan()
+	plan, err := RunGreptPlan(c)
 	require.NoError(t, err)
 	assert.Empty(t, plan.FailedRules)
 }

@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"fmt"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -41,7 +40,7 @@ func (s *httpDataSuite) TestHttpDatasource_Load() {
 	// Create a HttpDatasource instance
 	h := &HttpDatasource{
 		BaseBlock: &BaseBlock{
-			c:    &BaseConfig{ctx: context.TODO()},
+			c:    NewGreptConfig(),
 			name: "test",
 		},
 		Url:    ts.URL,

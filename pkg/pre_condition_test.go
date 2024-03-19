@@ -39,9 +39,9 @@ func (s *preConditionSuite) TestPreCondition_PassedHardcodedCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NoError(err)
 	rules := Blocks[Rule](config)
 	s.Len(rules, 1)
@@ -65,9 +65,9 @@ func (s *preConditionSuite) TestPreCondition_FaileddHardcodedConditionShouldFail
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NotNil(err)
 	s.Contains(err.Error(), "this precondition must be true")
 }
@@ -85,9 +85,9 @@ func (s *preConditionSuite) TestPreCondition_FaileddHardcodedCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NotNil(err)
 	s.Contains(err.Error(), "this precondition must be true")
 	rules := Blocks[Rule](config)
@@ -114,9 +114,9 @@ func (s *preConditionSuite) TestPreCondition_FunctionCallInCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NotNil(err)
 	s.Contains(err.Error(), "this precondition must be true")
 }
@@ -138,9 +138,9 @@ func (s *preConditionSuite) TestMultiplePreConditions_containFailedCheck() {
         }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NotNil(err)
 	s.Contains(err.Error(), "this precondition must be true")
 }
@@ -161,9 +161,9 @@ func (s *preConditionSuite) TestMultiplePreConditions_allPassedCheck() {
         }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NoError(err)
 }
 
@@ -189,11 +189,11 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttribute() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NoError(err) // Expect no error as the precondition should pass
 }
 
@@ -219,11 +219,11 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeFailedCheck
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.Contains(err.Error(), "Precondition check failed")
 }
 
@@ -260,11 +260,11 @@ func (s *preConditionSuite) TestPreCondition_ReferMultipleBlockAttributes() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NoError(err) // Expect no error as the precondition should pass
 }
 
@@ -301,11 +301,11 @@ func (s *preConditionSuite) TestPreCondition_ReferMultipleBlockAttributesFailedC
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.Contains(err.Error(), "Precondition check failed")
 }
 
@@ -341,11 +341,11 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeWithForEach
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NoError(err) // Expect no error as the precondition should pass
 }
 
@@ -381,11 +381,11 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeWithForEach
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := NewConfig("", "", nil)
+	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	s.NotNil(err)
 	s.Contains(err.Error(), "Precondition check failed item1")
 	s.Contains(err.Error(), "Precondition check failed item2")

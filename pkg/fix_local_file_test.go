@@ -173,9 +173,9 @@ func (s *localFileFixSuite) TestLocalFile_ApplyFix_FileMode() {
 			s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{config})
 			path := "/file1.txt"
 			// Create the file first
-			c, err := NewConfig("", "", nil)
+			c, err := LoadConfig(NewGreptConfig(), "", "", nil)
 			s.NoError(err)
-			p, err := c.Plan()
+			p, err := RunGreptPlan(c)
 			if sc.expectedErrorMessage != nil {
 				s.Contains(err.Error(), *sc.expectedErrorMessage)
 				return

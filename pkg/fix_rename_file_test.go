@@ -37,7 +37,7 @@ func (s *renameFileFixSuite) TestRenameFile_ApplyFix() {
 	// Initialize RenameFileFix fix
 	rf := &RenameFileFix{
 		BaseBlock: &BaseBlock{
-			c: &BaseConfig{},
+			c: NewGreptConfig(),
 		},
 		OldName: oldName,
 		NewName: newName,

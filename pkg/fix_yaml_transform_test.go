@@ -45,9 +45,9 @@ func (y *yamlTransformSuite) TestMultipleTransform() {
 	}
 `
 	y.dummyFsWithFiles([]string{"/example/test.grept.hcl"}, []string{hcl})
-	config, err := NewConfig("", "/example", context.TODO())
+	config, err := LoadConfig(NewGreptConfig(), "", "/example", context.TODO())
 	y.NoError(err)
-	_, err = config.Plan()
+	_, err = RunGreptPlan(config)
 	y.NoError(err)
 	fixes := Blocks[Fix](config)
 	y.Len(fixes, 1)
@@ -97,9 +97,7 @@ jobs:
 	y.dummyFsWithFiles([]string{yamlPath}, []string{yamlContent})
 	sut := &YamlTransformFix{
 		BaseBlock: &BaseBlock{
-			c: &BaseConfig{
-				ctx: context.TODO(),
-			},
+			c:    NewGreptConfig(),
 			name: "test",
 			id:   "test",
 		},

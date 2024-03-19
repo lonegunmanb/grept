@@ -291,12 +291,12 @@ func (bb *BaseBlock) setMetaNestedBlock() {
 	}
 }
 
-func plan(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func plan(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	self, _ := dag.GetVertex(blockAddress(b.HclBlock()))
 	return planBlock(self.(Block))
 }
 
-func tryEvalLocal(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func tryEvalLocal(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	l, ok := b.(*LocalBlock)
 	if !ok {
 		return nil
@@ -308,7 +308,7 @@ func tryEvalLocal(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) er
 	return nil
 }
 
-func expandBlocks(c *BaseConfig, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
+func expandBlocks(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	attr, ok := b.HclBlock().Body.Attributes["for_each"]
 	if !ok || b.getForEach() != nil {
 		return nil
