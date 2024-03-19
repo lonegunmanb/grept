@@ -129,7 +129,7 @@ func assertEdge(t *testing.T, dag *Dag, src, dest string) {
 func assertVertex(t *testing.T, dag *Dag, address string) {
 	b, err := dag.GetVertex(address)
 	assert.NoError(t, err)
-	bb, ok := b.(block)
+	bb, ok := b.(Block)
 	require.True(t, ok)
 	split := strings.Split(address, ".")
 	name := split[len(split)-1]

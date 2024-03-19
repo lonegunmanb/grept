@@ -25,41 +25,12 @@ type Config struct {
 	dag     *Dag
 }
 
-func (c *Config) DataBlocks() []Data {
-	var r []Data
+func Blocks[T Block](c *Config) []T {
+	var r []T
 	for _, b := range c.dag.GetVertices() {
-		if b.(block).BlockType() == "data" {
-			r = append(r, b.(Data))
-		}
-	}
-	return r
-}
-
-func (c *Config) RuleBlocks() []Rule {
-	var r []Rule
-	for _, b := range c.dag.GetVertices() {
-		if b.(block).BlockType() == "rule" {
-			r = append(r, b.(Rule))
-		}
-	}
-	return r
-}
-
-func (c *Config) FixBlocks() []Fix {
-	var r []Fix
-	for _, b := range c.dag.GetVertices() {
-		if b.(block).BlockType() == "fix" {
-			r = append(r, b.(Fix))
-		}
-	}
-	return r
-}
-
-func (c *Config) LocalBlocks() []Local {
-	var r []Local
-	for _, b := range c.dag.GetVertices() {
-		if b.(block).BlockType() == "local" {
-			r = append(r, b.(Local))
+		t, ok := b.(T)
+		if ok {
+			r = append(r, t)
 		}
 	}
 	return r
@@ -69,9 +40,9 @@ func (c *Config) EvalContext() *hcl.EvalContext {
 	return &hcl.EvalContext{
 		Functions: hclfuncs.Functions(c.basedir),
 		Variables: map[string]cty.Value{
-			"data":  Values(c.DataBlocks()),
-			"rule":  Values(c.RuleBlocks()),
-			"local": LocalsValues(c.LocalBlocks()),
+			"data":  Values(Blocks[Data](c)),
+			"rule":  Values(Blocks[Rule](c)),
+			"local": LocalsValues(Blocks[Local](c)),
 		},
 	}
 }
@@ -105,7 +76,7 @@ func newConfig(baseDir string, ctx context.Context, hclBlocks []*hclBlock, err e
 	config.basedir = baseDir
 	config.ctx = ctx
 
-	var blocks []block
+	var blocks []Block
 	for _, hb := range hclBlocks {
 		b, wrapError := wrapBlock(config, hb)
 		if wrapError != nil {
@@ -142,7 +113,7 @@ func (c *Config) Plan() (*Plan, error) {
 	}
 
 	plan := newPlan()
-	for _, rb := range c.RuleBlocks() {
+	for _, rb := range Blocks[Rule](c) {
 		checkErr := rb.CheckError()
 		if checkErr == nil {
 			continue
@@ -151,7 +122,7 @@ func (c *Config) Plan() (*Plan, error) {
 			Rule:       rb,
 			CheckError: checkErr,
 		})
-		for _, fb := range c.FixBlocks() {
+		for _, fb := range Blocks[Fix](c) {
 			if linq.From(fb.GetRuleIds()).Contains(rb.Id()) {
 				plan.addFix(fb)
 			}
@@ -161,16 +132,16 @@ func (c *Config) Plan() (*Plan, error) {
 	return plan, nil
 }
 
-func (dag *Dag) runDag(c *Config, onReady func(*Config, *Dag, *linkedlistqueue.Queue, block) error) error {
+func (dag *Dag) runDag(c *Config, onReady func(*Config, *Dag, *linkedlistqueue.Queue, Block) error) error {
 	var err error
 	visited := hashset.New()
 	pending := linkedlistqueue.New()
 	for _, n := range dag.GetRoots() {
-		pending.Enqueue(n.(block))
+		pending.Enqueue(n.(Block))
 	}
 	for !pending.Empty() {
 		next, _ := pending.Dequeue()
-		b := next.(block)
+		b := next.(Block)
 		// the node has already been expanded and deleted from dag
 		address := blockAddress(b.HclBlock())
 		exist := dag.exist(address)
@@ -216,7 +187,7 @@ func (d *Dag) exist(address string) bool {
 	return !notExist
 }
 
-func planBlock(b block) error {
+func planBlock(b Block) error {
 	decodeErr := decode(b)
 	if decodeErr != nil {
 		return fmt.Errorf("%s.%s.%s(%s) decode error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), decodeErr)
@@ -251,7 +222,7 @@ func planBlock(b block) error {
 	return nil
 }
 
-func wrapBlock(c *Config, hb *hclBlock) (block, error) {
+func wrapBlock(c *Config, hb *hclBlock) (Block, error) {
 	blockFactories := factories[hb.Type]
 	blockType := ""
 	if len(hb.Labels) > 0 {
@@ -336,10 +307,10 @@ func readRawHclBlock(b *hclsyntax.Block) []*hclsyntax.Block {
 	return newBlocks
 }
 
-func (c *Config) blocks() []block {
-	var blocks []block
+func (c *Config) blocks() []Block {
+	var blocks []Block
 	for _, n := range c.dag.GetVertices() {
-		blocks = append(blocks, n.(block))
+		blocks = append(blocks, n.(Block))
 	}
 	return blocks
 }

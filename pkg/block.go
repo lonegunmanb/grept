@@ -20,7 +20,7 @@ type BlockType interface {
 	BlockType() string
 }
 
-type block interface {
+type Block interface {
 	Id() string
 	Name() string
 	Type() string
@@ -31,12 +31,12 @@ type block interface {
 	BaseValues() map[string]cty.Value
 	PreConditionCheck(*hcl.EvalContext) ([]PreCondition, error)
 	forEachDefined() bool
-	getDownstreams() []block
+	getDownstreams() []Block
 	setForEach(*forEach)
 	getForEach() *forEach
 }
 
-func blockToString(f block) string {
+func blockToString(f Block) string {
 	marshal, _ := json.Marshal(f)
 	return string(marshal)
 }
@@ -44,7 +44,7 @@ func blockToString(f block) string {
 var metaAttributeNames = hashset.New("for_each", "rule_ids")
 var metaNestedBlockNames = hashset.New("precondition")
 
-func decode(b block) error {
+func decode(b Block) error {
 	hb := b.HclBlock()
 	evalContext := b.EvalContext()
 	if decodeBase, ok := b.(DecodeBase); ok {
@@ -98,7 +98,7 @@ func LocalsValues(blocks []Local) cty.Value {
 	return cty.ObjectVal(res)
 }
 
-func Values[T block](blocks []T) cty.Value {
+func Values[T Block](blocks []T) cty.Value {
 	if len(blocks) == 0 {
 		return cty.EmptyObjectVal
 	}
@@ -135,7 +135,7 @@ func Values[T block](blocks []T) cty.Value {
 	return cty.ObjectVal(res)
 }
 
-func blockToCtyValue(b block) cty.Value {
+func blockToCtyValue(b Block) cty.Value {
 	blockValues := map[string]cty.Value{}
 	baseCtyValues := b.BaseValues()
 	ctyValues := b.Values()
@@ -265,11 +265,11 @@ func (bb *BaseBlock) forEachDefined() bool {
 	return forEach
 }
 
-func (bb *BaseBlock) getDownstreams() []block {
-	var blocks []block
+func (bb *BaseBlock) getDownstreams() []Block {
+	var blocks []Block
 	children, _ := bb.c.dag.GetChildren(bb.blockAddress)
 	for _, c := range children {
-		blocks = append(blocks, c.(block))
+		blocks = append(blocks, c.(Block))
 	}
 	return blocks
 }
@@ -291,12 +291,12 @@ func (bb *BaseBlock) setMetaNestedBlock() {
 	}
 }
 
-func plan(c *Config, dag *Dag, q *linkedlistqueue.Queue, b block) error {
+func plan(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	self, _ := dag.GetVertex(blockAddress(b.HclBlock()))
-	return planBlock(self.(block))
+	return planBlock(self.(Block))
 }
 
-func tryEvalLocal(c *Config, dag *Dag, q *linkedlistqueue.Queue, b block) error {
+func tryEvalLocal(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	l, ok := b.(*LocalBlock)
 	if !ok {
 		return nil
@@ -308,7 +308,7 @@ func tryEvalLocal(c *Config, dag *Dag, q *linkedlistqueue.Queue, b block) error 
 	return nil
 }
 
-func expandBlocks(c *Config, dag *Dag, q *linkedlistqueue.Queue, b block) error {
+func expandBlocks(c *Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	attr, ok := b.HclBlock().Body.Attributes["for_each"]
 	if !ok || b.getForEach() != nil {
 		return nil

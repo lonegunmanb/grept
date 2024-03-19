@@ -39,7 +39,7 @@ locals {
 	_, err = c.Plan()
 	s.NoError(err)
 	var locals []Local
-	linq.From(c.LocalBlocks()).OrderBy(func(i interface{}) interface{} {
+	linq.From(Blocks[Local](c)).OrderBy(func(i interface{}) interface{} {
 		return i.(Local).Name()
 	}).ToSlice(&locals)
 	s.True(AreCtyValuesEqual(cty.StringVal("a"), locals[0].(*LocalBlock).Value))

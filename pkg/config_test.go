@@ -58,15 +58,17 @@ func (s *configSuite) TestParseConfig() {
 	require.NoError(t, err)
 	_, err = config.Plan()
 	require.NoError(t, err)
-	assert.Len(t, config.RuleBlocks(), 1)
-	fhr, ok := config.RuleBlocks()[0].(*FileHashRule)
+	rules := Blocks[Rule](config)
+	assert.Len(t, rules, 1)
+	fhr, ok := rules[0].(*FileHashRule)
 	require.True(t, ok)
 	assert.Equal(t, "*.txt", fhr.Glob)
 	assert.Equal(t, "abc123", fhr.Hash)
 	assert.Equal(t, "sha256", fhr.Algorithm)
 
-	assert.Len(t, config.FixBlocks(), 1)
-	lff, ok := config.FixBlocks()[0].(*LocalFileFix)
+	fixes := Blocks[Fix](config)
+	assert.Len(t, fixes, 1)
+	lff, ok := fixes[0].(*LocalFileFix)
 	require.True(t, ok)
 	assert.Regexp(t, `^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$`, lff.RuleIds[0])
 	assert.Equal(t, "/path/to/file.txt", lff.Paths[0])
@@ -146,8 +148,9 @@ func (s *configSuite) TestEvalContextRef() {
 	require.NoError(t, err)
 	_, err = config.Plan()
 	require.NoError(t, err)
-	require.Len(t, config.FixBlocks(), 1)
-	fix := config.FixBlocks()[0].(*LocalFileFix)
+	fixes := Blocks[Fix](config)
+	require.Len(t, fixes, 1)
+	fix := fixes[0].(*LocalFileFix)
 	assert.Equal(t, "LICENSE", fix.Paths[0])
 }
 
@@ -167,8 +170,9 @@ func (s *configSuite) TestFunctionInEvalContext() {
 	require.NoError(t, err)
 	_, err = config.Plan()
 	require.NoError(t, err)
-	require.Len(t, config.RuleBlocks(), 1)
-	rule, ok := config.RuleBlocks()[0].(*FileHashRule)
+	rules := Blocks[Rule](config)
+	require.Len(t, rules, 1)
+	rule, ok := rules[0].(*FileHashRule)
 	require.True(t, ok)
 	err = rule.ExecuteDuringPlan()
 	assert.NoError(t, err)
@@ -219,9 +223,10 @@ func (s *configSuite) TestParseConfigHttpBlock() {
 	_, err = config.Plan()
 	require.NoError(t, err)
 	// ExecuteDuringPlan the parsed configuration
-	assert.Len(t, config.DataBlocks(), 1, "There should be one data source")
+	datas := Blocks[Data](config)
+	assert.Len(t, datas, 1, "There should be one data source")
 
-	httpData, ok := config.DataBlocks()[0].(*HttpDatasource)
+	httpData, ok := datas[0].(*HttpDatasource)
 	assert.True(t, ok)
 	assert.Equal(t, "http://example.com", httpData.Url)
 	assert.Equal(t, "GET", httpData.Method)
@@ -377,9 +382,10 @@ rule must_be_true test {
 	assert.NoError(t, err)
 	_, err = c.Plan()
 	require.NoError(t, err)
-	assert.Len(t, c.RuleBlocks(), 2)
+	rules := Blocks[Rule](c)
+	assert.Len(t, rules, 2)
 	var types []string
-	linq.From(c.RuleBlocks()).Select(func(i interface{}) interface{} {
+	linq.From(rules).Select(func(i interface{}) interface{} {
 		return i.(Rule).Type()
 	}).ToSlice(&types)
 	assert.Contains(t, types, "file_hash")
@@ -535,7 +541,8 @@ locals {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{code})
 	c, err := NewConfig("/", "", nil)
 	s.NoError(err)
-	s.Len(c.LocalBlocks(), 2)
+	locals := Blocks[Local](c)
+	s.Len(locals, 2)
 }
 
 func (s *configSuite) TestLocalWithRuleAndFix() {
@@ -562,8 +569,9 @@ func (s *configSuite) TestLocalWithRuleAndFix() {
 	require.NoError(t, err)
 	_, err = config.Plan()
 	require.NoError(t, err)
-	require.Len(t, config.FixBlocks(), 1)
-	fix := config.FixBlocks()[0].(*LocalFileFix)
+	fixes := Blocks[Fix](config)
+	require.Len(t, fixes, 1)
+	fix := fixes[0].(*LocalFileFix)
 	assert.Equal(t, "LICENSE", fix.Paths[0])
 }
 
@@ -593,7 +601,8 @@ func (s *configSuite) TestLocalBetweenDataAndRule() {
 	s.NoError(err)
 	_, err = c.Plan()
 	s.NoError(err)
-	s.True(c.RuleBlocks()[0].(*MustBeTrueRule).Condition)
+	rules := Blocks[Rule](c)
+	s.True(rules[0].(*MustBeTrueRule).Condition)
 }
 
 func (s *configSuite) TestForEach_ForEachBlockShouldBeExpanded() {
@@ -611,7 +620,7 @@ func (s *configSuite) TestForEach_ForEachBlockShouldBeExpanded() {
 
 	config, err := NewConfig("", "", nil)
 	s.NoError(err)
-	s.Len(config.DataBlocks(), 3)
+	s.Len(Blocks[Data](config), 3)
 }
 
 func (s *configSuite) TestForEachAndAddressIndex() {
@@ -729,7 +738,7 @@ func (s *configSuite) TestForEach_forEachAsToggle() {
 
 	config, err := NewConfig("", "", nil)
 	require.NoError(s.T(), err)
-	s.Len(config.RuleBlocks(), 0)
+	s.Len(Blocks[Rule](config), 0)
 }
 
 func (s *configSuite) TestForEach_blocksWithIndexShouldHasNewBlockId() {
@@ -747,10 +756,11 @@ func (s *configSuite) TestForEach_blocksWithIndexShouldHasNewBlockId() {
 
 	config, err := NewConfig("", "", nil)
 	require.NoError(s.T(), err)
-	s.Len(config.RuleBlocks(), 2)
-	ruleBlocks := config.RuleBlocks()
-	rb0 := ruleBlocks[0].(block)
-	rb1 := ruleBlocks[1].(block)
+	rules := Blocks[Rule](config)
+	s.Len(rules, 2)
+	ruleBlocks := rules
+	rb0 := ruleBlocks[0].(Block)
+	rb1 := ruleBlocks[1].(Block)
 	b := rb0.Id() == rb1.Id()
 	s.False(b)
 	s.NotEqual(rb0.Id(), rb1.Id())

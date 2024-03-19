@@ -7,7 +7,9 @@ import (
 var _ Local = &LocalBlock{}
 
 type Local interface {
-	block
+	Block
+	// discriminator func
+	Local()
 }
 
 type LocalBlock struct {
@@ -28,6 +30,8 @@ func (l *LocalBlock) Values() map[string]cty.Value {
 		"": l.Value,
 	}
 }
+
+func (l *LocalBlock) Local() {}
 
 //func (l *LocalBlock) decode(b *hclsyntax.Body, ctx *hcl.EvalContext) error {
 //	for _, attr := range b.Attributes {

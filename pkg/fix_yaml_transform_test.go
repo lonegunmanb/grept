@@ -49,8 +49,9 @@ func (y *yamlTransformSuite) TestMultipleTransform() {
 	y.NoError(err)
 	_, err = config.Plan()
 	y.NoError(err)
-	y.Len(config.FixBlocks(), 1)
-	f, ok := config.FixBlocks()[0].(*YamlTransformFix)
+	fixes := Blocks[Fix](config)
+	y.Len(fixes, 1)
+	f, ok := fixes[0].(*YamlTransformFix)
 	y.True(ok)
 	y.Len(f.Transform, 2)
 	var paths []string

@@ -1,7 +1,9 @@
 package pkg
 
 type Data interface {
-	block
+	Block
+	// discriminator func
+	Data()
 }
 
 type BaseData struct{}
@@ -9,3 +11,5 @@ type BaseData struct{}
 func (bd *BaseData) BlockType() string {
 	return "data"
 }
+
+func (bd *BaseData) Data() {}

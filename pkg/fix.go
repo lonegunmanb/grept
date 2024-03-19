@@ -6,9 +6,11 @@ import (
 )
 
 type Fix interface {
-	block
+	Block
 	GetRuleIds() []string
 	Apply() error
+	// discriminator func
+	Fix()
 	setRuleIds([]string)
 }
 
@@ -18,6 +20,8 @@ var _ DecodeBase = &BaseFix{}
 type BaseFix struct {
 	RuleIds []string `json:"rule_ids" hcl:"rule_ids"`
 }
+
+func (bf *BaseFix) Fix() {}
 
 func (bf *BaseFix) Decode(hb *hclBlock, evalContext *hcl.EvalContext) error {
 	ruleIds, diag := hb.Body.Attributes["rule_ids"].Expr.Value(evalContext)

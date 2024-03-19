@@ -1,8 +1,10 @@
 package pkg
 
 type Rule interface {
-	block
+	Block
 	CheckError() error
+	// discriminator func
+	Rule()
 	setCheckError(error)
 }
 
@@ -17,6 +19,8 @@ func (br *BaseRule) BlockType() string {
 func (br *BaseRule) CheckError() error {
 	return br.checkErr
 }
+
+func (br *BaseRule) Rule() {}
 
 func (br *BaseRule) setCheckError(err error) {
 	br.checkErr = err

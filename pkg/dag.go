@@ -13,7 +13,7 @@ type Dag struct {
 	pendingUpstreams map[string]sets.Set
 }
 
-func newDag(blocks []block) (*Dag, error) {
+func newDag(blocks []Block) (*Dag, error) {
 	g := &Dag{
 		DAG:              dag.NewDAG(),
 		pendingUpstreams: make(map[string]sets.Set),

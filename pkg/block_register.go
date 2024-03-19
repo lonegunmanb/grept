@@ -7,7 +7,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-type blockConstructor = func(*Config, *hclBlock) block
+type blockConstructor = func(*Config, *hclBlock) Block
 type blockRegistry map[string]blockConstructor
 
 var baseFactory = map[string]func() any{}
@@ -19,19 +19,19 @@ func RegisterBaseBlock(factory func() BlockType) {
 	}
 }
 
-func RegisterBlock(t block) {
+func RegisterBlock(t Block) {
 	registry, ok := factories[t.BlockType()]
 	if !ok {
 		registry = make(blockRegistry)
 		factories[t.BlockType()] = registry
 	}
-	registry[t.Type()] = func(c *Config, hb *hclBlock) block {
+	registry[t.Type()] = func(c *Config, hb *hclBlock) Block {
 		newBlock := reflect.New(reflect.TypeOf(t).Elem()).Elem()
 		newBaseBlock := newBaseBlock(c, hb)
 		newBaseBlock.setForEach(hb.forEach)
 		newBaseBlock.setMetaNestedBlock()
 		newBlock.FieldByName("BaseBlock").Set(reflect.ValueOf(newBaseBlock))
-		b := newBlock.Addr().Interface().(block)
+		b := newBlock.Addr().Interface().(Block)
 		if f, ok := baseFactory[t.BlockType()]; ok {
 			blockName := cases.Title(language.English).String(t.BlockType())
 			newBlock.FieldByName("Base" + blockName).Set(reflect.ValueOf(f()))
