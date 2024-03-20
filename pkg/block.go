@@ -46,6 +46,8 @@ var metaAttributeNames = hashset.New("for_each", "rule_ids")
 var metaNestedBlockNames = hashset.New("precondition")
 
 func decode(b Block) error {
+	// we need set defaults first, otherwise when we try to get eval context, multiple instances might have different values for attributes those have default value, one has passed `decode` and it's attribute has been filled with default value, another hasn't, then their type could be different.
+	defaults.SetDefaults(b)
 	hb := b.HclBlock()
 	evalContext := b.EvalContext()
 	if decodeBase, ok := b.(DecodeBase); ok {
@@ -58,6 +60,7 @@ func decode(b Block) error {
 	if diag.HasErrors() {
 		return diag
 	}
+	// we need set defaults again, since gohcl.DecodeBody might erase default value set on those attribute has null values.
 	defaults.SetDefaults(b)
 	return nil
 }
