@@ -10,8 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/emirpasic/gods/sets/hashset"
-	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/zclconf/go-cty/cty"
 	"golang.org/x/net/http/httpproxy"
@@ -22,8 +20,13 @@ var _ Data = &HttpDatasource{}
 type HttpDatasource struct {
 	*BaseBlock
 	*BaseData
-	Url             string            `hcl:"url"`
-	Method          string            `hcl:"method,optional" default:"GET"`
+	Url string `hcl:"url"`
+	/*
+		if !validHttpMethods.Contains(h.Method) {
+				err = multierror.Append(err, fmt.Errorf(`"method"" must be one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"`))
+			}
+	*/
+	Method          string            `hcl:"method,optional" default:"GET" validate:"oneof=GET HEAD POST PUT DELETE CONNECT OPTIONS TRACE PATCH"`
 	RequestBody     string            `hcl:"request_body,optional"`
 	RequestHeaders  map[string]string `hcl:"request_headers,optional"`
 	RetryMax        int               `hcl:"retry_max,optional" default:"4"`
@@ -93,14 +96,4 @@ func (h *HttpDatasource) Values() map[string]cty.Value {
 		"request_headers":  ToCtyValue(h.RequestHeaders),
 		"response_headers": ToCtyValue(h.ResponseHeaders),
 	}
-}
-
-var validHttpMethods = hashset.New("GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH")
-
-func (h *HttpDatasource) Validate() error {
-	var err error
-	if !validHttpMethods.Contains(h.Method) {
-		err = multierror.Append(err, fmt.Errorf(`"method"" must be one of "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"`))
-	}
-	return err
 }

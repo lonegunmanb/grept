@@ -19,10 +19,6 @@ func registerValidator() {
 	_ = Validate.RegisterValidation("file_mode", validateFileMode)
 }
 
-type Validatable interface {
-	Validate() error
-}
-
 func validateFileMode(fl validator.FieldLevel) bool {
 	field := fl.Field().Interface()
 	num, ok := field.(fs.FileMode)

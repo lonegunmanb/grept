@@ -60,3 +60,21 @@ func (s *httpDataSuite) TestHttpDatasource_Load() {
 	assert.True(t, ok)
 	assert.Equal(t, "text/plain", ct)
 }
+
+func (s *httpDataSuite) TestHttpDatasource_InvalidMethod() {
+	content := `
+	data "http" foo {
+		url = "http://foo"
+		method = "foo"
+	}
+	`
+
+	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
+
+	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	s.NoError(err)
+	_, err = RunGreptPlan(config)
+	s.NotNil(err)
+	s.Contains(err.Error(), "valid")
+
+}

@@ -181,12 +181,6 @@ func planBlock(b Block) error {
 	if decodeErr != nil {
 		return fmt.Errorf("%s.%s.%s(%s) decode error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), decodeErr)
 	}
-	//TODO: Remove this
-	if v, ok := b.(Validatable); ok {
-		if err := v.Validate(); err != nil {
-			return fmt.Errorf("%s.%s.%s is not valid: %s", b.BlockType(), b.Type(), b.Name(), err.Error())
-		}
-	}
 	if validateErr := Validate.Struct(b); validateErr != nil {
 		return fmt.Errorf("%s.%s.%s is not valid: %s", b.BlockType(), b.Type(), b.Name(), validateErr.Error())
 	}
