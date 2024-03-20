@@ -86,15 +86,13 @@ func cleanBodyForDecode(hb *hclBlock) *hclsyntax.Body {
 	return newBody
 }
 
-func LocalsValues(blocks []Local) cty.Value {
+func SingleValues(blocks []SingleValueBlock) cty.Value {
 	if len(blocks) == 0 {
 		return cty.EmptyObjectVal
 	}
 	res := map[string]cty.Value{}
 	for _, b := range blocks {
-		for _, v := range b.Values() {
-			res[b.Name()] = v
-		}
+		res[b.Name()] = b.Value()
 	}
 	return cty.ObjectVal(res)
 }
@@ -304,7 +302,7 @@ func tryEvalLocal(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	}
 	value, diag := l.HclBlock().Body.Attributes["value"].Expr.Value(c.EvalContext())
 	if !diag.HasErrors() {
-		l.Value = value
+		l.LocalValue = value
 	}
 	return nil
 }

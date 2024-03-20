@@ -10,22 +10,22 @@ import (
 func Test_LocalBlocksValueShouldBeAFlattenObject(t *testing.T) {
 	numberVal := cty.NumberVal(big.NewFloat(1))
 	stringVal := cty.StringVal("hello world")
-	locals := []Local{
+	locals := []Block{
 		&LocalBlock{
 			BaseBlock: &BaseBlock{
 				name: "number_value",
 			},
-			Value: numberVal,
+			LocalValue: numberVal,
 		},
 		&LocalBlock{
 			BaseBlock: &BaseBlock{
 				name: "string_value",
 			},
-			Value: stringVal,
+			LocalValue: stringVal,
 		},
 	}
 
-	values := LocalsValues(locals)
+	values := SingleValues(castBlock[SingleValueBlock](locals))
 	assert.True(t, AreCtyValuesEqual(numberVal, values.GetAttr("number_value")))
 	assert.True(t, AreCtyValuesEqual(stringVal, values.GetAttr("string_value")))
 }

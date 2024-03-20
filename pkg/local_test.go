@@ -42,9 +42,9 @@ locals {
 	linq.From(Blocks[Local](c)).OrderBy(func(i interface{}) interface{} {
 		return i.(Local).Name()
 	}).ToSlice(&locals)
-	s.True(AreCtyValuesEqual(cty.StringVal("a"), locals[0].(*LocalBlock).Value))
-	s.True(AreCtyValuesEqual(cty.NumberVal(big.NewFloat(1)), locals[1].(*LocalBlock).Value))
-	s.True(AreCtyValuesEqual(cty.ListVal([]cty.Value{cty.StringVal("2"), cty.StringVal("4")}), locals[2].(*LocalBlock).Value))
+	s.True(AreCtyValuesEqual(cty.StringVal("a"), locals[0].(*LocalBlock).LocalValue))
+	s.True(AreCtyValuesEqual(cty.NumberVal(big.NewFloat(1)), locals[1].(*LocalBlock).LocalValue))
+	s.True(AreCtyValuesEqual(cty.ListVal([]cty.Value{cty.StringVal("2"), cty.StringVal("4")}), locals[2].(*LocalBlock).LocalValue))
 }
 
 func AreCtyValuesEqual(val1, val2 cty.Value) bool {

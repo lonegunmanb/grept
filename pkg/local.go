@@ -7,15 +7,18 @@ import (
 var _ Local = &LocalBlock{}
 
 type Local interface {
-	Block
+	SingleValueBlock
 	// discriminator func
 	Local()
-	Values() map[string]cty.Value
 }
 
 type LocalBlock struct {
 	*BaseBlock
-	Value cty.Value `hcl:"value"`
+	LocalValue cty.Value `hcl:"value"`
+}
+
+func (l *LocalBlock) Value() cty.Value {
+	return l.LocalValue
 }
 
 func (l *LocalBlock) Type() string {
@@ -24,12 +27,6 @@ func (l *LocalBlock) Type() string {
 
 func (l *LocalBlock) BlockType() string {
 	return "local"
-}
-
-func (l *LocalBlock) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"": l.Value,
-	}
 }
 
 func (l *LocalBlock) Local() {}

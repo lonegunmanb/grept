@@ -79,12 +79,12 @@ func (c *BaseConfig) blocksByTypes() map[string][]Block {
 func (c *BaseConfig) EvalContext() *hcl.EvalContext {
 	ctx := hcl.EvalContext{
 		Functions: hclfuncs.Functions(c.basedir),
-		Variables: map[string]cty.Value{
-			"local": LocalsValues(Blocks[Local](c)),
-		},
+		Variables: make(map[string]cty.Value),
 	}
 	for bt, bs := range c.blocksByTypes() {
-		if bt == "local" {
+		sample := bs[0]
+		if _, ok := sample.(SingleValueBlock); ok {
+			ctx.Variables[bt] = SingleValues(castBlock[SingleValueBlock](bs))
 			continue
 		}
 		ctx.Variables[bt] = Values(bs)
@@ -307,4 +307,12 @@ func blocks(c IDag) []Block {
 		blocks = append(blocks, n.(Block))
 	}
 	return blocks
+}
+
+func castBlock[T Block](s []Block) []T {
+	var r []T
+	for _, b := range s {
+		r = append(r, b.(T))
+	}
+	return r
 }
