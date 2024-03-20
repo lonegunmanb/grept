@@ -27,9 +27,9 @@ type HttpDatasource struct {
 	RequestBody     string            `hcl:"request_body,optional"`
 	RequestHeaders  map[string]string `hcl:"request_headers,optional"`
 	RetryMax        int               `hcl:"retry_max,optional" default:"4"`
-	ResponseBody    string
-	ResponseHeaders map[string]string
-	StatusCode      int
+	ResponseBody    string            `attribute:"response_body"`
+	ResponseHeaders map[string]string `attribute:"response_headers"`
+	StatusCode      int               `attribute:"status_code"`
 }
 
 func (h *HttpDatasource) ExecuteDuringPlan() error {

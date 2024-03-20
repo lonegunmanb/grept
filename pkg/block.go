@@ -27,7 +27,6 @@ type Block interface {
 	BlockType() string
 	HclBlock() *hclBlock
 	EvalContext() *hcl.EvalContext
-	Values() map[string]cty.Value
 	BaseValues() map[string]cty.Value
 	PreConditionCheck(*hcl.EvalContext) ([]PreCondition, error)
 	AddressLength() int
@@ -140,7 +139,7 @@ func Values[T Block](blocks []T) cty.Value {
 func blockToCtyValue(b Block) cty.Value {
 	blockValues := map[string]cty.Value{}
 	baseCtyValues := b.BaseValues()
-	ctyValues := b.Values()
+	ctyValues := Value(b) //.Values()
 	for k, v := range ctyValues {
 		blockValues[k] = v
 	}

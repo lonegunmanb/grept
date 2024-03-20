@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Rule = &MustBeTrueRule{}
@@ -23,11 +22,4 @@ func (m *MustBeTrueRule) ExecuteDuringPlan() error {
 
 func (m *MustBeTrueRule) Type() string {
 	return "must_be_true"
-}
-
-func (m *MustBeTrueRule) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"condition":     ToCtyValue(m.Condition),
-		"error_message": ToCtyValue(m.ErrorMessage),
-	}
 }

@@ -11,7 +11,6 @@ import (
 
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/alexellis/go-execute/v2"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Fix = &LocalShellFix{}
@@ -30,14 +29,6 @@ type LocalShellFix struct {
 
 func (l *LocalShellFix) Type() string {
 	return "local_shell"
-}
-
-func (l *LocalShellFix) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"inlines":       ToCtyValue(l.Inlines),
-		"script":        ToCtyValue(l.Script),
-		"remote_script": ToCtyValue(l.RemoteScript),
-	}
 }
 
 var stopByOnlyOnStub = func() {}

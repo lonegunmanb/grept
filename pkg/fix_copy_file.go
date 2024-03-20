@@ -3,7 +3,6 @@ package pkg
 import (
 	"fmt"
 	"github.com/spf13/afero"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Fix = &CopyFileFix{}
@@ -17,14 +16,6 @@ type CopyFileFix struct {
 
 func (c *CopyFileFix) Type() string {
 	return "copy_file"
-}
-
-func (c *CopyFileFix) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"rule_ids": ToCtyValue(c.RuleIds),
-		"src":      ToCtyValue(c.Src),
-		"dest":     ToCtyValue(c.Dest),
-	}
 }
 
 func (c *CopyFileFix) Apply() error {

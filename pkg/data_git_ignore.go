@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"github.com/spf13/afero"
 	"strings"
-
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Data = &GitIgnoreDatasource{}
@@ -13,7 +11,7 @@ var _ Data = &GitIgnoreDatasource{}
 type GitIgnoreDatasource struct {
 	*BaseBlock
 	*BaseData
-	Records []string
+	Records []string `attribute:"records"`
 }
 
 func (g *GitIgnoreDatasource) ExecuteDuringPlan() error {
@@ -48,10 +46,4 @@ func (g *GitIgnoreDatasource) ExecuteDuringPlan() error {
 
 func (g *GitIgnoreDatasource) Type() string {
 	return "git_ignore"
-}
-
-func (g *GitIgnoreDatasource) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"records": ToCtyValue(g.Records),
-	}
 }

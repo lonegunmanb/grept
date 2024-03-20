@@ -6,7 +6,6 @@ import (
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/spf13/afero"
-	"github.com/zclconf/go-cty/cty"
 	"strings"
 )
 
@@ -21,14 +20,6 @@ type GitIgnoreFix struct {
 
 func (g *GitIgnoreFix) Type() string {
 	return "git_ignore"
-}
-
-func (g *GitIgnoreFix) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"rule_ids":  ToCtyValue(g.RuleIds),
-		"exist":     ToCtyValue(g.Exist),
-		"not_exist": ToCtyValue(g.NotExist),
-	}
 }
 
 func (g *GitIgnoreFix) Apply() error {

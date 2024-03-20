@@ -50,9 +50,9 @@ func ToCtyValue(input interface{}) cty.Value {
 	case reflect.Struct:
 		vals := make(map[string]cty.Value)
 		for i := 0; i < val.NumField(); i++ {
-			fieldName := val.Type().Field(i).Name
-			fieldValue := val.Field(i)
-			vals[fieldName] = ToCtyValue(fieldValue.Interface())
+			fn, _ := fieldName(val.Type().Field(i))
+			fv := val.Field(i)
+			vals[fn] = ToCtyValue(fv.Interface())
 		}
 		return cty.ObjectVal(vals)
 	case reflect.Ptr:

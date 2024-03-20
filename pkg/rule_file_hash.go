@@ -17,11 +17,11 @@ var _ Rule = &FileHashRule{}
 type FileHashRule struct {
 	*BaseBlock
 	*BaseRule
-	Glob               string `hcl:"glob"`
-	Hash               string `hcl:"hash"`
-	Algorithm          string `hcl:"algorithm,optional" default:"sha1"`
-	FailOnHashMismatch bool   `hcl:"fail_on_hash_mismatch,optional"`
-	HashMismatchFiles  []string
+	Glob               string   `hcl:"glob"`
+	Hash               string   `hcl:"hash"`
+	Algorithm          string   `hcl:"algorithm,optional" default:"sha1"`
+	FailOnHashMismatch bool     `hcl:"fail_on_hash_mismatch,optional"`
+	HashMismatchFiles  []string `attribute:"hash_mismatch_files"`
 }
 
 func (fhr *FileHashRule) Type() string {

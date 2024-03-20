@@ -1,9 +1,5 @@
 package pkg
 
-import (
-	"github.com/zclconf/go-cty/cty"
-)
-
 var _ Fix = &RenameFileFix{}
 
 type RenameFileFix struct {
@@ -20,11 +16,4 @@ func (rf *RenameFileFix) Type() string {
 func (rf *RenameFileFix) Apply() error {
 	fs := FsFactory()
 	return fs.Rename(rf.OldName, rf.NewName)
-}
-
-func (rf *RenameFileFix) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"old_name": ToCtyValue(rf.OldName),
-		"new_name": ToCtyValue(rf.NewName),
-	}
 }

@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"github.com/hashicorp/go-multierror"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Fix = &RmLocalFileFix{}
@@ -27,10 +26,4 @@ func (r *RmLocalFileFix) Apply() error {
 		}
 	}
 	return err
-}
-
-func (r *RmLocalFileFix) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"paths": ToCtyValue(r.Paths),
-	}
 }

@@ -111,7 +111,7 @@ func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Value() {
 		ErrorMessage: "Test error message",
 	}
 
-	value := mustBeTrueRule.Values()
+	value := Value(mustBeTrueRule)
 
 	assert.Equal(t, map[string]cty.Value{
 		"condition":     cty.BoolVal(mustBeTrueRule.Condition),

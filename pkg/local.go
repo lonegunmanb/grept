@@ -10,6 +10,7 @@ type Local interface {
 	Block
 	// discriminator func
 	Local()
+	Values() map[string]cty.Value
 }
 
 type LocalBlock struct {

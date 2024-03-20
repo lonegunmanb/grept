@@ -2,8 +2,8 @@ package pkg
 
 import (
 	"fmt"
+
 	"github.com/spf13/afero"
-	"github.com/zclconf/go-cty/cty"
 )
 
 var _ Rule = &DirExistRule{}
@@ -13,13 +13,6 @@ type DirExistRule struct {
 	*BaseRule
 	Dir         string `hcl:"dir"`
 	FailOnExist bool   `hcl:"fail_on_exist,optional"`
-}
-
-func (d *DirExistRule) Values() map[string]cty.Value {
-	return map[string]cty.Value{
-		"dir":            ToCtyValue(d.Dir),
-		"faile_on_exist": ToCtyValue(d.FailOnExist),
-	}
 }
 
 func (d *DirExistRule) Type() string {
