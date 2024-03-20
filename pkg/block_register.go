@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/emirpasic/gods/sets"
 	"github.com/emirpasic/gods/sets/hashset"
+	"github.com/lonegunmanb/go-defaults"
 	"reflect"
 
 	"golang.org/x/text/cases"
@@ -47,6 +48,7 @@ func RegisterBlock(t Block) {
 			blockName := cases.Title(language.English).String(bt)
 			newBlock.FieldByName("Base" + blockName).Set(reflect.ValueOf(f()))
 		}
+		defaults.SetDefaults(b)
 		return b
 	}
 }

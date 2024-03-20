@@ -73,6 +73,7 @@ func (c *BaseConfig) EvalContext() *hcl.EvalContext {
 		Variables: map[string]cty.Value{
 			"data":  Values(Blocks[Data](c)),
 			"rule":  Values(Blocks[Rule](c)),
+			"fix":   Values(Blocks[Fix](c)),
 			"local": LocalsValues(Blocks[Local](c)),
 		},
 	}

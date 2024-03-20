@@ -39,9 +39,16 @@ func (y *YamlTransformFix) Values() map[string]cty.Value {
 			"string_value": ToCtyValue(t.StringValue),
 		}))
 	}
+	transformVals := cty.ListValEmpty(cty.Object(map[string]cty.Type{
+		"yaml_path":    cty.String,
+		"string_value": cty.String,
+	}))
+	if len(transforms) > 0 {
+		transformVals = cty.ListVal(transforms)
+	}
 	return map[string]cty.Value{
 		"file_path": ToCtyValue(y.FilePath),
-		"transform": cty.ListVal(transforms),
+		"transform": transformVals,
 	}
 }
 
