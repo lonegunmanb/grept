@@ -13,6 +13,23 @@ type TestStruct struct {
 	Age  int
 }
 
+type KubernetesCluster struct {
+	Name                      string                     `hcl:"name"`
+	ImageCleanerIntervalHours int                        `hcl:"image_cleaner_interval_hours"`
+	DefaultNodePool           *KubernetesClusterNodePool `hcl:"default_node_pool"`
+}
+
+type LinuxOsConfig struct {
+	SwapFileSizeMb            int    `hcl:"swap_file_size_mb"`
+	TransparentHugePageDefrag string `hcl:"transparent_huge_page_defrag"`
+}
+
+type KubernetesClusterNodePool struct {
+	Name          string         `hcl:"name"`
+	NodeCount     int            `hcl:"node_count"`
+	LinuxOsConfig *LinuxOsConfig `hcl:"linux_os_config"`
+}
+
 func TestToCtyValue(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -94,6 +111,33 @@ func TestToCtyValue(t *testing.T) {
 			name:  "nil pointer to struct",
 			input: (*TestStruct)(nil),
 			want:  cty.NilVal,
+		},
+		{
+			name: "Mock block object with field annotation, map key should be read from annotation",
+			input: &KubernetesCluster{
+				Name:                      "test",
+				ImageCleanerIntervalHours: 24,
+				DefaultNodePool: &KubernetesClusterNodePool{
+					Name:      "default",
+					NodeCount: 3,
+					LinuxOsConfig: &LinuxOsConfig{
+						SwapFileSizeMb:            1024,
+						TransparentHugePageDefrag: "always",
+					},
+				},
+			},
+			want: cty.ObjectVal(map[string]cty.Value{
+				"name":                         cty.StringVal("test"),
+				"image_cleaner_interval_hours": cty.NumberIntVal(24),
+				"default_node_pool": cty.ObjectVal(map[string]cty.Value{
+					"name":       cty.StringVal("default"),
+					"node_count": cty.NumberIntVal(3),
+					"linux_os_config": cty.ObjectVal(map[string]cty.Value{
+						"swap_file_size_mb":            cty.NumberIntVal(1024),
+						"transparent_huge_page_defrag": cty.StringVal("always"),
+					}),
+				}),
+			}),
 		},
 	}
 
