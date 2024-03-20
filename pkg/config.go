@@ -24,8 +24,8 @@ type Config interface {
 	SetContext(context.Context)
 	SetBaseDir(string)
 	EvalContext() *hcl.EvalContext
-	SetDag(*Dag)
 	IgnoreUnsupportedBlock() bool
+	setDag(*Dag)
 }
 
 var _ Config = &GreptConfig{}
@@ -48,7 +48,7 @@ func (c *BaseConfig) SetContext(ctx context.Context) {
 	c.ctx = ctx
 }
 
-func (c *BaseConfig) SetDag(d *Dag) {
+func (c *BaseConfig) setDag(d *Dag) {
 	c.dag = d
 }
 
@@ -123,7 +123,7 @@ func newConfig(config Config, baseDir string, ctx context.Context, hclBlocks []*
 	if err != nil {
 		return nil, err
 	}
-	config.SetDag(dag)
+	config.setDag(dag)
 	err = dag.runDag(config, tryEvalLocal)
 	if err != nil {
 		return nil, err
