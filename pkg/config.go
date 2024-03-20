@@ -67,16 +67,29 @@ func (c *BaseConfig) Dag() *Dag {
 	return c.dag
 }
 
+func (c *BaseConfig) blocksByTypes() map[string][]Block {
+	r := make(map[string][]Block)
+	for _, b := range blocks(c) {
+		bt := b.BlockType()
+		r[bt] = append(r[bt], b)
+	}
+	return r
+}
+
 func (c *BaseConfig) EvalContext() *hcl.EvalContext {
-	return &hcl.EvalContext{
+	ctx := hcl.EvalContext{
 		Functions: hclfuncs.Functions(c.basedir),
 		Variables: map[string]cty.Value{
-			"data":  Values(Blocks[Data](c)),
-			"rule":  Values(Blocks[Rule](c)),
-			"fix":   Values(Blocks[Fix](c)),
 			"local": LocalsValues(Blocks[Local](c)),
 		},
 	}
+	for bt, bs := range c.blocksByTypes() {
+		if bt == "local" {
+			continue
+		}
+		ctx.Variables[bt] = Values(bs)
+	}
+	return &ctx
 }
 
 func NewBasicConfig() *BaseConfig {
