@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 
 	"github.com/spf13/afero"
 )
@@ -9,7 +10,7 @@ import (
 var _ Rule = &DirExistRule{}
 
 type DirExistRule struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseRule
 	Dir         string `hcl:"dir"`
 	FailOnExist bool   `hcl:"fail_on_exist,optional"`

@@ -1,9 +1,11 @@
 package pkg
 
+import "github.com/Azure/grept/golden"
+
 var _ Fix = &RenameFileFix{}
 
 type RenameFileFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	OldName string `json:"old_name" hcl:"old_name"`
 	NewName string `json:"new_name" hcl:"new_name"`

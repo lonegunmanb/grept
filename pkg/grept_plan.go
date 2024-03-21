@@ -2,20 +2,22 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/ahmetb/go-linq/v3"
+	"github.com/emirpasic/gods/queues/linkedlistqueue"
 	"github.com/hashicorp/go-multierror"
 	"strings"
 	"sync"
 )
 
-func RunGreptPlan(c Config) (*GreptPlan, error) {
-	err := c.Dag().runDag(c, plan)
+func RunGreptPlan(c golden.Config) (*GreptPlan, error) {
+	err := c.RunDag(plan)
 	if err != nil {
 		return nil, err
 	}
 
 	plan := newPlan()
-	for _, rb := range Blocks[Rule](c) {
+	for _, rb := range golden.Blocks[Rule](c) {
 		checkErr := rb.CheckError()
 		if checkErr == nil {
 			continue
@@ -24,7 +26,7 @@ func RunGreptPlan(c Config) (*GreptPlan, error) {
 			Rule:       rb,
 			CheckError: checkErr,
 		})
-		for _, fb := range Blocks[Fix](c) {
+		for _, fb := range golden.Blocks[Fix](c) {
 			if linq.From(fb.GetRuleIds()).Contains(rb.Id()) {
 				plan.addFix(fb)
 			}
@@ -34,7 +36,7 @@ func RunGreptPlan(c Config) (*GreptPlan, error) {
 	return plan, nil
 }
 
-var _ Plan = &GreptPlan{}
+var _ golden.Plan = &GreptPlan{}
 
 type GreptPlan struct {
 	FailedRules []*FailedRule
@@ -55,7 +57,7 @@ func (p *GreptPlan) String() string {
 		sb.WriteString("\n---\n")
 	}
 	for _, f := range p.Fixes {
-		sb.WriteString(fmt.Sprintf("%s would be apply:\n %s\n", f.Address(), blockToString(f)))
+		sb.WriteString(fmt.Sprintf("%s would be apply:\n %s\n", f.Address(), golden.BlockToString(f)))
 		sb.WriteString("\n---\n")
 	}
 
@@ -65,7 +67,7 @@ func (p *GreptPlan) String() string {
 func (p *GreptPlan) Apply() error {
 	var err error
 	for _, fix := range p.Fixes {
-		if err = decode(fix); err != nil {
+		if err = golden.Decode(fix); err != nil {
 			err = multierror.Append(err, fmt.Errorf("rule.%s.%s(%s) decode error: %+v", fix.Type(), fix.Name(), fix.HclBlock().Range().String(), err))
 		}
 		if err != nil {
@@ -94,6 +96,11 @@ func (p *GreptPlan) addFix(f Fix) {
 	p.mu.Lock()
 	p.Fixes[f.Id()] = f
 	p.mu.Unlock()
+}
+
+func plan(c golden.Config, dag *golden.Dag, q *linkedlistqueue.Queue, b golden.Block) error {
+	self, _ := dag.GetVertex(b.Address())
+	return golden.RunPlan(self.(golden.Block))
 }
 
 type FailedRule struct {

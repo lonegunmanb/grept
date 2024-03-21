@@ -3,6 +3,7 @@ package pkg
 import (
 	"bufio"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/spf13/afero"
@@ -12,7 +13,7 @@ import (
 var _ Fix = &GitIgnoreFix{}
 
 type GitIgnoreFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	Exist    []string `hcl:"exist,optional" validate:"at_least_one_of=Exist NotExist"`
 	NotExist []string `hcl:"not_exist,optional" validate:"at_least_one_of=Exist NotExist"`

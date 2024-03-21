@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/grept/pkg"
 	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Azure/grept/pkg"
 	"github.com/prashantv/gostub"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"

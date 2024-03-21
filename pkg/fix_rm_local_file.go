@@ -1,13 +1,14 @@
 package pkg
 
 import (
+	"github.com/Azure/grept/golden"
 	"github.com/hashicorp/go-multierror"
 )
 
 var _ Fix = &RmLocalFileFix{}
 
 type RmLocalFileFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	Paths []string `hcl:"paths" json:"paths"`
 }

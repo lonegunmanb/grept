@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/google/uuid"
 	"github.com/prashantv/gostub"
@@ -154,7 +155,7 @@ func (s *localExecFixSuite) TestLocalExecShell_CommandValidate() {
 	}
 	for _, c := range cases {
 		s.Run(c.desc, func() {
-			err := Validate.Struct(*c.f)
+			err := golden.Validate.Struct(*c.f)
 			if c.wantError {
 				assert.Error(s.T(), err)
 			} else {

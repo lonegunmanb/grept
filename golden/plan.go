@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import (
 	"fmt"
@@ -10,10 +10,10 @@ type Plan interface {
 	Apply() error
 }
 
-func planBlock(b Block) error {
-	decodeErr := decode(b)
+func RunPlan(b Block) error {
+	decodeErr := Decode(b)
 	if decodeErr != nil {
-		return fmt.Errorf("%s.%s.%s(%s) decode error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), decodeErr)
+		return fmt.Errorf("%s(%s) Decode error: %+v", b.Address(), b.HclBlock().Range().String(), decodeErr)
 	}
 	if validateErr := Validate.Struct(b); validateErr != nil {
 		return fmt.Errorf("%s.%s.%s is not valid: %s", b.BlockType(), b.Type(), b.Name(), validateErr.Error())

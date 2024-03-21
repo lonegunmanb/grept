@@ -1,7 +1,9 @@
 package pkg
 
+import "github.com/Azure/grept/golden"
+
 type Rule interface {
-	PlanBlock
+	golden.PlanBlock
 	CheckError() error
 	// discriminator func
 	Rule()

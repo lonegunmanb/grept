@@ -3,6 +3,7 @@ package pkg
 import (
 	"bufio"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/lonegunmanb/hclfuncs"
 	"io"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 var _ Fix = &LocalShellFix{}
 
 type LocalShellFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	ExecuteCommand []string          `hcl:"execute_command,optional" default:"[/bin/sh,-c]"` // The command used to execute the script.
 	InlineShebang  string            `hcl:"inline_shebang,optional" validate:"required_with=Inlines"`
@@ -38,11 +39,7 @@ func (l *LocalShellFix) Apply() (err error) {
 	if len(l.Env) > 0 {
 		hclfuncs.GoroutineLocalEnv.Set(l.Env)
 		defer hclfuncs.GoroutineLocalEnv.Remove()
-		//diag := gohcl.DecodeBody(l.HclBlock().Body, l.EvalContext(), l)
-		//if diag.HasErrors() {
-		//	return diag
-		//}
-		err := decode(l)
+		err := golden.Decode(l)
 		if err != nil {
 			return err
 		}

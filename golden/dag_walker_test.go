@@ -1,7 +1,8 @@
-package pkg
+package golden
 
 import (
 	"fmt"
+	"github.com/Azure/grept/pkg"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -14,7 +15,7 @@ import (
 
 type dagSuite struct {
 	suite.Suite
-	*testBase
+	*golden.testBase
 	server *httptest.Server
 }
 
@@ -23,7 +24,7 @@ func TestDagSuite(t *testing.T) {
 }
 
 func (s *dagSuite) SetupTest() {
-	s.testBase = newTestBase()
+	s.testBase = golden.newTestBase()
 	s.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("Expected content"))
 	}))

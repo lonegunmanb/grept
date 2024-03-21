@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 
 	"github.com/hashicorp/go-multierror"
 	yaml "github.com/lonegunmanb/atomatt-yaml"
@@ -15,7 +16,7 @@ import (
 var _ Fix = &YamlTransformFix{}
 
 type YamlTransformFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	FilePath  string          `hcl:"file_path" json:"file_path" validate:"endswith=.yaml|endswith=.yml"`
 	Transform []YamlTransform `hcl:"transform,block"`

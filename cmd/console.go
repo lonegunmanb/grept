@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Azure/grept/pkg"
+	"github.com/Azure/grept/golden"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/peterh/liner"
@@ -42,11 +42,11 @@ func replFunc() func(*cobra.Command, []string) error {
 		if err != nil {
 			return fmt.Errorf("error getting os wd: %+v", err)
 		}
-		config, err := pkg.BuildGreptConfig(pwd, configPath, c.Context())
+		config, err := golden.BuildGreptConfig(pwd, configPath, c.Context())
 		if err != nil {
 			return fmt.Errorf("error parsing config: %+v", err)
 		}
-		_, err = pkg.RunGreptPlan(config)
+		_, err = golden.RunGreptPlan(config)
 		if err != nil {
 			return fmt.Errorf("error plan config: %+v", err)
 		}
@@ -75,7 +75,7 @@ func replFunc() func(*cobra.Command, []string) error {
 					fmt.Printf("%s\n", diag.Error())
 					continue
 				}
-				fmt.Println(pkg.CtyValueToString(value))
+				fmt.Println(golden.CtyValueToString(value))
 			} else if errors.Is(err, liner.ErrPromptAborted) {
 				fmt.Println("Aborted")
 				break

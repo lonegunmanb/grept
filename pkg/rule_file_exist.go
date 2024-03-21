@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/spf13/afero"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -9,7 +10,7 @@ import (
 var _ Rule = &FileExistRule{}
 
 type FileExistRule struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseRule
 	Glob       string `hcl:"glob"`
 	MatchFiles []string
@@ -21,8 +22,8 @@ func (f *FileExistRule) Type() string {
 
 func (f *FileExistRule) Values() map[string]cty.Value {
 	return map[string]cty.Value{
-		"glob":        ToCtyValue(f.Glob),
-		"match_files": ToCtyValue(f.MatchFiles),
+		"glob":        golden.ToCtyValue(f.Glob),
+		"match_files": golden.ToCtyValue(f.MatchFiles),
 	}
 }
 

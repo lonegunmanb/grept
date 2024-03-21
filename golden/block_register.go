@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import (
 	"github.com/emirpasic/gods/sets"
@@ -53,30 +53,12 @@ func RegisterBlock(t Block) {
 	}
 }
 
+func IsBlockTypeWanted(bt string) bool {
+	return validBlockTypes.Contains(bt)
+}
+
 func registerLocal() {
 	RegisterBlock(new(LocalBlock))
 }
 
 var factories = map[string]blockRegistry{}
-
-func registerFix() {
-	RegisterBlock(new(CopyFileFix))
-	RegisterBlock(new(LocalFileFix))
-	RegisterBlock(new(RenameFileFix))
-	RegisterBlock(new(RmLocalFileFix))
-	RegisterBlock(new(LocalShellFix))
-	RegisterBlock(new(GitIgnoreFix))
-	RegisterBlock(new(YamlTransformFix))
-}
-
-func registerRule() {
-	RegisterBlock(new(FileExistRule))
-	RegisterBlock(new(FileHashRule))
-	RegisterBlock(new(MustBeTrueRule))
-	RegisterBlock(new(DirExistRule))
-}
-
-func registerData() {
-	RegisterBlock(new(HttpDatasource))
-	RegisterBlock(new(GitIgnoreDatasource))
-}

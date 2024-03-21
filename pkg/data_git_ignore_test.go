@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/Azure/grept/golden"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -71,7 +72,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_Value() {
 			".terraform",
 		},
 	}
-	value := Value(gitIgnore)
+	value := golden.Value(gitIgnore)
 	records, ok := value["records"]
 	s.True(ok)
 	s.Equal(2, records.LengthInt())

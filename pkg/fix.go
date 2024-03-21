@@ -1,20 +1,21 @@
 package pkg
 
 import (
+	"github.com/Azure/grept/golden"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type Fix interface {
-	ApplyBlock
+	golden.ApplyBlock
 	GetRuleIds() []string
 	// discriminator func
 	Fix()
 	setRuleIds([]string)
 }
 
-var _ Valuable = &BaseFix{}
-var _ CustomDecodeBase = &BaseFix{}
+var _ golden.Valuable = &BaseFix{}
+var _ golden.CustomDecodeBase = &BaseFix{}
 
 type BaseFix struct {
 	RuleIds []string `json:"rule_ids" hcl:"rule_ids"`
@@ -22,7 +23,7 @@ type BaseFix struct {
 
 func (bf *BaseFix) Fix() {}
 
-func (bf *BaseFix) Decode(hb *HclBlock, evalContext *hcl.EvalContext) error {
+func (bf *BaseFix) Decode(hb *golden.HclBlock, evalContext *hcl.EvalContext) error {
 	ruleIds, diag := hb.Body.Attributes["rule_ids"].Expr.Value(evalContext)
 	if diag.HasErrors() {
 		return diag
@@ -37,7 +38,7 @@ func (bf *BaseFix) Decode(hb *HclBlock, evalContext *hcl.EvalContext) error {
 
 func (bf *BaseFix) Values() map[string]cty.Value {
 	return map[string]cty.Value{
-		"rule_ids": ToCtyValue(bf.RuleIds),
+		"rule_ids": golden.ToCtyValue(bf.RuleIds),
 	}
 }
 

@@ -2,13 +2,14 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/spf13/afero"
 )
 
 var _ Fix = &CopyFileFix{}
 
 type CopyFileFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	Src  string `json:"src" hcl:"src"`
 	Dest string `json:"dest" hcl:"dest"`

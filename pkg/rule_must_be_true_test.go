@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,7 +41,6 @@ func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Check() {
 		{
 			name: "Condition is true",
 			rule: &MustBeTrueRule{
-				BaseBlock:    new(BaseBlock),
 				BaseRule:     new(BaseRule),
 				Condition:    true,
 				ErrorMessage: "",
@@ -50,7 +50,6 @@ func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Check() {
 		{
 			name: "Condition is false",
 			rule: &MustBeTrueRule{
-				BaseBlock:    new(BaseBlock),
 				BaseRule:     new(BaseRule),
 				Condition:    false,
 				ErrorMessage: "Test error message",
@@ -105,13 +104,12 @@ func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Eval() {
 func (s *mustBeTrueRuleSuite) TestMustBeTrueRule_Value() {
 	t := s.T()
 	mustBeTrueRule := &MustBeTrueRule{
-		BaseBlock:    new(BaseBlock),
 		BaseRule:     new(BaseRule),
 		Condition:    true,
 		ErrorMessage: "Test error message",
 	}
 
-	value := Value(mustBeTrueRule)
+	value := golden.Value(mustBeTrueRule)
 
 	assert.Equal(t, map[string]cty.Value{
 		"condition":     cty.BoolVal(mustBeTrueRule.Condition),

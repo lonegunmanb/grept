@@ -1,7 +1,8 @@
-package pkg
+package golden
 
 import (
 	"fmt"
+	"github.com/Azure/grept/pkg"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -12,7 +13,7 @@ import (
 
 type preConditionSuite struct {
 	suite.Suite
-	*testBase
+	*golden.testBase
 }
 
 func TestPreConditionSuite(t *testing.T) {
@@ -20,7 +21,7 @@ func TestPreConditionSuite(t *testing.T) {
 }
 
 func (s *preConditionSuite) SetupTest() {
-	s.testBase = newTestBase()
+	s.testBase = golden.newTestBase()
 }
 
 func (s *preConditionSuite) TearDownTest() {

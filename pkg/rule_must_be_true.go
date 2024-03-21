@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 )
 
 var _ Rule = &MustBeTrueRule{}
 
 type MustBeTrueRule struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseRule
 	Condition    bool   `hcl:"condition"`
 	ErrorMessage string `hcl:"error_message,optional"`

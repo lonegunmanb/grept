@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import (
 	"github.com/stretchr/testify/assert"

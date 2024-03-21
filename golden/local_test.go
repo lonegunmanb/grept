@@ -1,6 +1,7 @@
-package pkg
+package golden
 
 import (
+	"github.com/Azure/grept/pkg"
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/stretchr/testify/suite"
 	"github.com/zclconf/go-cty/cty"
@@ -10,7 +11,7 @@ import (
 
 type localSuite struct {
 	suite.Suite
-	*testBase
+	*golden.testBase
 }
 
 func TestLocalSuite(t *testing.T) {
@@ -18,7 +19,7 @@ func TestLocalSuite(t *testing.T) {
 }
 
 func (s *localSuite) SetupTest() {
-	s.testBase = newTestBase()
+	s.testBase = golden.newTestBase()
 }
 
 func (s *localSuite) TearDownTest() {

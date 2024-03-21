@@ -1,7 +1,8 @@
-package pkg
+package golden
 
 import (
 	"context"
+	"github.com/emirpasic/gods/queues/linkedlistqueue"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/lonegunmanb/hclfuncs"
 	"github.com/zclconf/go-cty/cty"
@@ -19,6 +20,10 @@ func (c *BaseConfig) Context() context.Context {
 
 func (c *BaseConfig) Dag() *Dag {
 	return c.dag
+}
+
+func (c *BaseConfig) RunDag(onReady func(Config, *Dag, *linkedlistqueue.Queue, Block) error) error {
+	return c.dag.runDag(c, onReady)
 }
 
 func (c *BaseConfig) blocksByTypes() map[string][]Block {

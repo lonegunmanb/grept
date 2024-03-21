@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/zclconf/go-cty/cty"
 	"hash"
 
@@ -15,7 +16,7 @@ import (
 var _ Rule = &FileHashRule{}
 
 type FileHashRule struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseRule
 	Glob               string   `hcl:"glob"`
 	Hash               string   `hcl:"hash"`
@@ -30,11 +31,11 @@ func (fhr *FileHashRule) Type() string {
 
 func (fhr *FileHashRule) Values() map[string]cty.Value {
 	return map[string]cty.Value{
-		"glob":                  ToCtyValue(fhr.Glob),
-		"hash":                  ToCtyValue(fhr.Hash),
-		"algorithm":             ToCtyValue(fhr.Algorithm),
-		"fail_on_hash_mismatch": ToCtyValue(fhr.FailOnHashMismatch),
-		"hash_mismatch_files":   ToCtyValue(fhr.HashMismatchFiles),
+		"glob":                  golden.ToCtyValue(fhr.Glob),
+		"hash":                  golden.ToCtyValue(fhr.Hash),
+		"algorithm":             golden.ToCtyValue(fhr.Algorithm),
+		"fail_on_hash_mismatch": golden.ToCtyValue(fhr.FailOnHashMismatch),
+		"hash_mismatch_files":   golden.ToCtyValue(fhr.HashMismatchFiles),
 	}
 }
 

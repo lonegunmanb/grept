@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import (
 	"github.com/zclconf/go-cty/cty"

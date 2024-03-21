@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"context"
+	"github.com/Azure/grept/golden"
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
@@ -49,7 +50,7 @@ func (y *yamlTransformSuite) TestMultipleTransform() {
 	y.NoError(err)
 	_, err = RunGreptPlan(config)
 	y.NoError(err)
-	fixes := Blocks[Fix](config)
+	fixes := golden.Blocks[Fix](config)
 	y.Len(fixes, 1)
 	f, ok := fixes[0].(*YamlTransformFix)
 	y.True(ok)

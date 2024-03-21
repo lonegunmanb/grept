@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -71,7 +72,7 @@ rule dir_exist test {
 			s.NoError(err)
 			_, err = RunGreptPlan(config)
 			s.NoError(err)
-			rules := Blocks[Rule](config)
+			rules := golden.Blocks[Rule](config)
 			s.Len(rules, 1)
 			rule, ok := rules[0].(*DirExistRule)
 			s.True(ok)

@@ -1,6 +1,7 @@
-package pkg
+package golden
 
 import (
+	"github.com/Azure/grept/pkg"
 	"github.com/stretchr/testify/suite"
 	"io/fs"
 	"testing"
@@ -8,7 +9,7 @@ import (
 
 type forEachTestSuite struct {
 	suite.Suite
-	*testBase
+	*golden.testBase
 }
 
 func TestForEachTestSuite(t *testing.T) {
@@ -16,7 +17,7 @@ func TestForEachTestSuite(t *testing.T) {
 }
 
 func (s *forEachTestSuite) SetupTest() {
-	s.testBase = newTestBase()
+	s.testBase = golden.newTestBase()
 }
 
 func (s *forEachTestSuite) SetupSubTest() {

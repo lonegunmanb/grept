@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 type ApplyBlock interface {
 	Block

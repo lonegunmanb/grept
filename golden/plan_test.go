@@ -1,7 +1,8 @@
-package pkg
+package golden
 
 import (
 	"fmt"
+	"github.com/Azure/grept/pkg"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -10,20 +11,20 @@ import (
 func TestPlan_String(t *testing.T) {
 	tests := []struct {
 		name string
-		plan *GreptPlan
+		plan *pkg.GreptPlan
 		want []string
 	}{
 		{
 			name: "Test Plan String",
-			plan: &GreptPlan{
-				FailedRules: []*FailedRule{
+			plan: &pkg.GreptPlan{
+				FailedRules: []*pkg.FailedRule{
 					{
-						Rule: &FileHashRule{
+						Rule: &pkg.FileHashRule{
 							BaseBlock: &BaseBlock{
 								blockAddress: "rule.file_hash.test-rule",
 								name:         "test-rule",
 								id:           "1",
-								hb: newHclBlock(&hclsyntax.Block{
+								hb: NewHclBlock(&hclsyntax.Block{
 									Type:   "rule",
 									Labels: []string{"file_hash", "test-rule"},
 								}, nil),
@@ -35,12 +36,12 @@ func TestPlan_String(t *testing.T) {
 						CheckError: fmt.Errorf("test error"),
 					},
 				},
-				Fixes: map[string]Fix{
-					"test_id": &LocalFileFix{
+				Fixes: map[string]pkg.Fix{
+					"test_id": &pkg.LocalFileFix{
 						BaseBlock: &BaseBlock{
 							name:         "test-fix",
 							blockAddress: "fix.local_file.test-fix",
-							hb: newHclBlock(&hclsyntax.Block{
+							hb: NewHclBlock(&hclsyntax.Block{
 								Type:   "fix",
 								Labels: []string{"local_file", "test-fix"},
 							}, nil),

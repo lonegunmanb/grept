@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import "github.com/hashicorp/hcl/v2/hclsyntax"
 

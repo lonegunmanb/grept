@@ -3,6 +3,7 @@ package pkg
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"io"
 	"log"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 var _ Data = &HttpDatasource{}
 
 type HttpDatasource struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseData
 	Url string `hcl:"url"`
 	/*
@@ -57,7 +58,7 @@ func (h *HttpDatasource) ExecuteDuringPlan() error {
 	retryClient.RetryMax = h.RetryMax
 	request, err := retryablehttp.NewRequestWithContext(h.Context(), h.Method, h.Url, strings.NewReader(h.RequestBody))
 	if err != nil {
-		return fmt.Errorf("error creating request data.http.%s, %s", h.name, err.Error())
+		return fmt.Errorf("error creating request %s, %s", h.Address(), err.Error())
 	}
 	for k, v := range h.RequestHeaders {
 		request.Header.Set(k, v)
@@ -65,12 +66,12 @@ func (h *HttpDatasource) ExecuteDuringPlan() error {
 	response, err := retryClient.Do(request)
 
 	if err != nil {
-		return fmt.Errorf("error making request data.http.%s, detail: %s", h.name, err.Error())
+		return fmt.Errorf("error making request %s, detail: %s", h.Address(), err.Error())
 	}
 	defer func() { _ = response.Body.Close() }()
 	bytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return fmt.Errorf("error reading response body data.http.%s, detail: %s", h.name, err.Error())
+		return fmt.Errorf("error reading response body %s, detail: %s", h.Address(), err.Error())
 	}
 	h.ResponseBody = string(bytes)
 	h.ResponseHeaders = make(map[string]string)
@@ -88,12 +89,12 @@ func (h *HttpDatasource) Type() string {
 
 func (h *HttpDatasource) Values() map[string]cty.Value {
 	return map[string]cty.Value{
-		"url":              ToCtyValue(h.Url),
-		"method":           ToCtyValue(h.Method),
-		"request_body":     ToCtyValue(h.RequestBody),
-		"response_body":    ToCtyValue(h.ResponseBody),
-		"status_code":      ToCtyValue(int64(h.StatusCode)),
-		"request_headers":  ToCtyValue(h.RequestHeaders),
-		"response_headers": ToCtyValue(h.ResponseHeaders),
+		"url":              golden.ToCtyValue(h.Url),
+		"method":           golden.ToCtyValue(h.Method),
+		"request_body":     golden.ToCtyValue(h.RequestBody),
+		"response_body":    golden.ToCtyValue(h.ResponseBody),
+		"status_code":      golden.ToCtyValue(int64(h.StatusCode)),
+		"request_headers":  golden.ToCtyValue(h.RequestHeaders),
+		"response_headers": golden.ToCtyValue(h.ResponseHeaders),
 	}
 }

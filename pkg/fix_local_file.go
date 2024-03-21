@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"fmt"
+	"github.com/Azure/grept/golden"
 	"io/fs"
 	"path/filepath"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 var _ Fix = &LocalFileFix{}
 
 type LocalFileFix struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseFix
 	Paths   []string     `json:"paths" hcl:"paths"`
 	Content string       `json:"content" hcl:"content"`

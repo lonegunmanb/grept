@@ -1,7 +1,9 @@
 package pkg
 
+import "github.com/Azure/grept/golden"
+
 type Data interface {
-	PlanBlock
+	golden.PlanBlock
 	// discriminator func
 	Data()
 }

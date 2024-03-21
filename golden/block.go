@@ -1,4 +1,4 @@
-package pkg
+package golden
 
 import (
 	"encoding/json"
@@ -34,7 +34,7 @@ type Block interface {
 	getForEach() *forEach
 }
 
-func blockToString(f Block) string {
+func BlockToString(f Block) string {
 	marshal, _ := json.Marshal(f)
 	return string(marshal)
 }
@@ -42,7 +42,7 @@ func blockToString(f Block) string {
 var metaAttributeNames = hashset.New("for_each", "rule_ids")
 var metaNestedBlockNames = hashset.New("precondition")
 
-func decode(b Block) error {
+func Decode(b Block) error {
 	hb := b.HclBlock()
 	evalContext := b.EvalContext()
 	if decodeBase, ok := b.(CustomDecodeBase); ok {
@@ -171,11 +171,6 @@ func blockAddress(b *HclBlock) string {
 	return sb.String()
 }
 
-func plan(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
-	self, _ := dag.GetVertex(b.Address())
-	return planBlock(self.(Block))
-}
-
 func tryEvalLocal(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	l, ok := b.(*LocalBlock)
 	if !ok {
@@ -212,7 +207,7 @@ func expandBlocks(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	iterator := forEachValue.ElementIterator()
 	for iterator.Next() {
 		key, value := iterator.Element()
-		newBlock := newHclBlock(b.HclBlock().Block, &forEach{key: key, value: value})
+		newBlock := NewHclBlock(b.HclBlock().Block, &forEach{key: key, value: value})
 		nb, err := wrapBlock(c, newBlock)
 		if err != nil {
 			return err

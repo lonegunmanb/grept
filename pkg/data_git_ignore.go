@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bufio"
+	"github.com/Azure/grept/golden"
 	"github.com/spf13/afero"
 	"strings"
 )
@@ -9,7 +10,7 @@ import (
 var _ Data = &GitIgnoreDatasource{}
 
 type GitIgnoreDatasource struct {
-	*BaseBlock
+	*golden.BaseBlock
 	*BaseData
 	Records []string `attribute:"records"`
 }

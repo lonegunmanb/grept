@@ -1,9 +1,10 @@
-package pkg
+package golden
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Azure/grept/pkg"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -21,7 +22,7 @@ import (
 
 type configSuite struct {
 	suite.Suite
-	*testBase
+	*golden.testBase
 }
 
 func TestConfigSuite(t *testing.T) {
@@ -29,7 +30,7 @@ func TestConfigSuite(t *testing.T) {
 }
 
 func (s *configSuite) SetupTest() {
-	s.testBase = newTestBase()
+	s.testBase = golden.newTestBase()
 }
 
 func (s *configSuite) TearDownTest() {
@@ -355,11 +356,11 @@ func (s *configSuite) TestApplyPlan_multiple_file_fix() {
 	err = plan.Apply()
 	require.NoError(t, err)
 
-	content1, err := afero.ReadFile(FsFactory(), "/example/sub1/testfile")
+	content1, err := afero.ReadFile(pkg.FsFactory(), "/example/sub1/testfile")
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", string(content1))
 
-	content2, err := afero.ReadFile(FsFactory(), "/example/sub2/testfile")
+	content2, err := afero.ReadFile(pkg.FsFactory(), "/example/sub2/testfile")
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", string(content2))
 }
@@ -441,7 +442,7 @@ func (s *configSuite) TestHttpDatasource_DefaultMethodShouldBeGet() {
 					},
 				},
 			}
-			err := decode(h)
+			err := Decode(h)
 			assert.NoError(s.T(), err)
 			assert.Equal(s.T(), c.want, h.Method)
 		})
@@ -816,7 +817,7 @@ func (s *configSuite) TestApplyPlan_file_fix_with_null_mode() {
 	err = plan.Apply()
 	require.NoError(t, err)
 
-	content1, err := afero.ReadFile(FsFactory(), "/example/testfile")
+	content1, err := afero.ReadFile(pkg.FsFactory(), "/example/testfile")
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", string(content1))
 }
