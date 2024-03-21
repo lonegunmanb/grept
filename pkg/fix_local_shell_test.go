@@ -191,11 +191,6 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_Inlines() {
 		t.Skip("cannot run this test on windows")
 	}
 	fix := &LocalShellFix{
-		BaseBlock: &BaseBlock{
-			id:   "test",
-			name: "test",
-			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		Inlines:        []string{`echo "Hello, World!"`},
 	}
@@ -230,11 +225,6 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_script() {
 	_ = tmpScript.Close()
 
 	fix := &LocalShellFix{
-		BaseBlock: &BaseBlock{
-			id:   "test",
-			name: "test",
-			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		Script:         tmpScript.Name(),
 	}
@@ -266,11 +256,6 @@ func (s *localExecFixSuite) TestLocalShellFix_ApplyFix_RemoteScript() {
 	defer ts.Close()
 
 	fix := &LocalShellFix{
-		BaseBlock: &BaseBlock{
-			id:   "test",
-			name: "test",
-			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
 		ExecuteCommand: []string{"/bin/sh", "-c"},
 		RemoteScript:   fmt.Sprintf("%s/test.sh", ts.URL),
 	}

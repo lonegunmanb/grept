@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,9 +36,6 @@ func (s *renameFileFixSuite) TestRenameFile_ApplyFix() {
 
 	// Initialize RenameFileFix fix
 	rf := &RenameFileFix{
-		BaseBlock: &BaseBlock{
-			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
 		OldName: oldName,
 		NewName: newName,
 	}

@@ -96,11 +96,6 @@ jobs:
 	yamlPath := "./target.yaml"
 	y.dummyFsWithFiles([]string{yamlPath}, []string{yamlContent})
 	sut := &YamlTransformFix{
-		BaseBlock: &BaseBlock{
-			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-			name: "test",
-			id:   "test",
-		},
 		FilePath: yamlPath,
 		Transform: []YamlTransform{
 			{

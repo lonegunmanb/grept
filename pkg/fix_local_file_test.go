@@ -64,10 +64,9 @@ func (s *localFileFixSuite) TestLocalFile_ApplyFix_OverwriteExistingFile() {
 	path := "/file1.txt"
 	mode := iofs.FileMode(0644)
 	fix := &LocalFileFix{
-		BaseBlock: &BaseBlock{},
-		Paths:     []string{path},
-		Content:   "Hello, world!",
-		Mode:      &mode,
+		Paths:   []string{path},
+		Content: "Hello, world!",
+		Mode:    &mode,
 	}
 
 	// Create the file first
@@ -95,10 +94,9 @@ func TestLocalFile_ApplyFix_FileInSubFolder(t *testing.T) {
 	//must use 644 here
 	mode := iofs.FileMode(644)
 	fix := &LocalFileFix{
-		BaseBlock: &BaseBlock{},
-		Paths:     []string{filePath},
-		Content:   "Hello, world!",
-		Mode:      &mode,
+		Paths:   []string{filePath},
+		Content: "Hello, world!",
+		Mode:    &mode,
 	}
 
 	fs := FsFactory()

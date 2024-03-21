@@ -32,10 +32,16 @@ func newBaseBlock(c Config, hb *HclBlock) *BaseBlock {
 }
 
 func (bb *BaseBlock) Id() string {
+	if bb == nil {
+		return ""
+	}
 	return bb.id
 }
 
 func (bb *BaseBlock) Name() string {
+	if bb == nil {
+		return ""
+	}
 	return bb.name
 }
 
@@ -74,11 +80,14 @@ func (bb *BaseBlock) EvalContext() *hcl.EvalContext {
 }
 
 func (bb *BaseBlock) Address() string {
+	if bb == nil {
+		return ""
+	}
 	return bb.blockAddress
 }
 
 func (bb *BaseBlock) Context() context.Context {
-	if bb.c == nil {
+	if bb == nil || bb.c == nil {
 		return context.TODO()
 	}
 	return bb.c.Context()

@@ -52,7 +52,7 @@ func (h *HttpDatasource) ExecuteDuringPlan() error {
 	}
 
 	retryClient := retryablehttp.NewClient()
-	retryClient.Logger = log.New(os.Stderr, fmt.Sprintf("data.http.%s:", h.name), log.LstdFlags)
+	retryClient.Logger = log.New(os.Stderr, fmt.Sprintf("%s:", h.Address()), log.LstdFlags)
 	retryClient.HTTPClient.Transport = clonedTr
 	retryClient.RetryMax = h.RetryMax
 	request, err := retryablehttp.NewRequestWithContext(h.Context(), h.Method, h.Url, strings.NewReader(h.RequestBody))

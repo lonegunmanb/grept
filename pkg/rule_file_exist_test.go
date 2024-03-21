@@ -34,10 +34,6 @@ func (s *fileExistRuleSuite) TestFileExistRule_Check() {
 		{
 			name: "file exists",
 			rule: &FileExistRule{
-				BaseBlock: &BaseBlock{
-					name: "test",
-					id:   "test",
-				},
 				BaseRule: new(BaseRule),
 				Glob:     "./file1.txt",
 			},
@@ -46,10 +42,6 @@ func (s *fileExistRuleSuite) TestFileExistRule_Check() {
 		{
 			name: "file does not exist",
 			rule: &FileExistRule{
-				BaseBlock: &BaseBlock{
-					name: "test",
-					id:   "test",
-				},
 				BaseRule: new(BaseRule),
 				Glob:     "./nofile.txt",
 			},

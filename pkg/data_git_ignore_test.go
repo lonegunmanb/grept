@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -32,11 +31,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_Load() {
 	s.dummyFsWithFiles([]string{".gitignore"}, []string{ignoreContent})
 
 	// create GitIgnoreDatasource instance and load .gitignore content
-	gitIgnore := &GitIgnoreDatasource{
-		BaseBlock: &BaseBlock{
-			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
-	}
+	gitIgnore := &GitIgnoreDatasource{}
 
 	err := gitIgnore.ExecuteDuringPlan()
 
@@ -51,11 +46,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_NoGitIgnoreFile() {
 	t := s.T()
 
 	// create GitIgnoreDatasource instance and load .gitignore content
-	gitIgnore := &GitIgnoreDatasource{
-		BaseBlock: &BaseBlock{
-			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
-	}
+	gitIgnore := &GitIgnoreDatasource{}
 
 	err := gitIgnore.ExecuteDuringPlan()
 	require.NoError(t, err)
@@ -66,11 +57,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_TabSpaceNewLine() {
 	content := "\t\n   \n \t \n\t \t\n\n\r\n"
 	s.dummyFsWithFiles([]string{".gitignore"}, []string{content})
 
-	gitIgnore := &GitIgnoreDatasource{
-		BaseBlock: &BaseBlock{
-			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
-	}
+	gitIgnore := &GitIgnoreDatasource{}
 	err := gitIgnore.ExecuteDuringPlan()
 
 	require.NoError(s.T(), err)
@@ -79,9 +66,6 @@ func (s *gitIgnoreSuite) TestGitIgnore_TabSpaceNewLine() {
 
 func (s *gitIgnoreSuite) TestGitIgnore_Value() {
 	gitIgnore := &GitIgnoreDatasource{
-		BaseBlock: &BaseBlock{
-			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-		},
 		Records: []string{
 			".tfstate",
 			".terraform",

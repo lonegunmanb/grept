@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -28,12 +27,6 @@ func (s *gitIgnoreFixSuite) TestApplyGitIgnoreFix() {
 	s.dummyFsWithFiles([]string{".gitignore"}, []string{"old_content\n"})
 
 	gitIgnoreFix := &GitIgnoreFix{
-		BaseBlock: &BaseBlock{
-			c: func() Config {
-				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
-				return cfg
-			}(),
-		},
 		Exist:    []string{"new_content"},
 		NotExist: []string{"old_content"},
 	}
@@ -52,12 +45,6 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFixEnsureExist() {
 	s.dummyFsWithFiles([]string{".gitignore"}, []string{"content\n"})
 
 	gitIgnoreFix := &GitIgnoreFix{
-		BaseBlock: &BaseBlock{
-			c: func() Config {
-				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
-				return cfg
-			}(),
-		},
 		Exist: []string{"new_content"},
 	}
 
@@ -77,11 +64,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_NotExistWontRemoveComment() {
 content
 `})
 
-	cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 	gitIgnoreFix := &GitIgnoreFix{
-		BaseBlock: &BaseBlock{
-			c: cfg,
-		},
 		NotExist: []string{"content"},
 	}
 
@@ -99,12 +82,6 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_TrimItem() {
 	s.dummyFsWithFiles([]string{".gitignore"}, []string{"\r\n#comment\r\n\t.terraform \r\n\t terraform.tfstate \r\n"})
 
 	gitIgnoreFix := &GitIgnoreFix{
-		BaseBlock: &BaseBlock{
-			c: func() Config {
-				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
-				return cfg
-			}(),
-		},
 		Exist:    []string{" new_content\t\n", "another_content\r\n"},
 		NotExist: []string{".terraform"},
 	}
@@ -124,12 +101,6 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_TrimItem() {
 
 func (s *gitIgnoreFixSuite) TestGitIgnoreFix_GitIgnoreFileAbsent() {
 	gitIgnoreFix := &GitIgnoreFix{
-		BaseBlock: &BaseBlock{
-			c: func() Config {
-				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
-				return cfg
-			}(),
-		},
 		Exist:    []string{"content"},
 		NotExist: []string{"new_content"},
 	}

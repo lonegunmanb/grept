@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"context"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -27,11 +26,6 @@ func TestCopyFileFixSuite(t *testing.T) {
 func (s *copyFileFixSuite) TestCopyFileFix() {
 	s.dummyFsWithFiles([]string{"/example/test"}, []string{"hello world"})
 	sut := &CopyFileFix{
-		BaseBlock: &BaseBlock{
-			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
-			name: "test",
-			id:   "test",
-		},
 		Src:  "/example/test",
 		Dest: "/example/test2",
 	}
