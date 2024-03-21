@@ -5,13 +5,13 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-type hclBlock struct {
+type HclBlock struct {
 	*hclsyntax.Block
 	*forEach
 }
 
-func newHclBlock(hb *hclsyntax.Block, each *forEach) *hclBlock {
-	return &hclBlock{
+func newHclBlock(hb *hclsyntax.Block, each *forEach) *HclBlock {
+	return &HclBlock{
 		Block:   hb,
 		forEach: each,
 	}

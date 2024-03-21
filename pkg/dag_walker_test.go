@@ -55,7 +55,7 @@ func (s *dagSuite) TestDag_DagVertex() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	d, err := newDag(blocks(config))
 	s.NoError(err)
@@ -88,7 +88,7 @@ func (s *dagSuite) TestDag_DagBlocksShouldBeConnectedWithEdgeIfThereIsReferenceB
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
 	dag, err := newDag(blocks(config))
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func (s *dagSuite) TestDag_CycleDependencyShouldCauseError() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
 
-	_, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	_, err := BuildGreptConfig("", "", nil)
 	s.NotNil(err)
 	// The error message must contain both of two blocks' address so we're sure that it's about the loop.
 	s.Contains(err.Error(), "data.http.sample")

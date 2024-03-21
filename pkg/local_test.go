@@ -34,7 +34,7 @@ locals {
 }
 `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{code})
-	c, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	c, err := BuildGreptConfig("/", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(c)
 	s.NoError(err)

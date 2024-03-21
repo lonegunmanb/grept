@@ -25,7 +25,7 @@ type Block interface {
 	Name() string
 	Type() string
 	BlockType() string
-	HclBlock() *hclBlock
+	HclBlock() *HclBlock
 	EvalContext() *hcl.EvalContext
 	BaseValues() map[string]cty.Value
 	PreConditionCheck(*hcl.EvalContext) ([]PreCondition, error)
@@ -62,7 +62,7 @@ func decode(b Block) error {
 	return nil
 }
 
-func cleanBodyForDecode(hb *hclBlock) *hclsyntax.Body {
+func cleanBodyForDecode(hb *HclBlock) *hclsyntax.Body {
 	// Create a new hclsyntax.Body
 	newBody := &hclsyntax.Body{
 		Attributes: make(hclsyntax.Attributes),
@@ -162,7 +162,7 @@ func concatLabels(labels []string) string {
 	return sb.String()
 }
 
-func blockAddress(b *hclBlock) string {
+func blockAddress(b *HclBlock) string {
 	sb := strings.Builder{}
 	sb.WriteString(b.Block.Type)
 	sb.WriteString(".")
@@ -175,7 +175,7 @@ func blockAddress(b *hclBlock) string {
 
 type BaseBlock struct {
 	c             Config
-	hb            *hclBlock
+	hb            *HclBlock
 	name          string
 	id            string
 	blockAddress  string
@@ -183,7 +183,7 @@ type BaseBlock struct {
 	preConditions []PreCondition
 }
 
-func newBaseBlock(c Config, hb *hclBlock) *BaseBlock {
+func newBaseBlock(c Config, hb *HclBlock) *BaseBlock {
 	bb := &BaseBlock{
 		c:            c,
 		hb:           hb,
@@ -202,9 +202,9 @@ func (bb *BaseBlock) Name() string {
 	return bb.name
 }
 
-func (bb *BaseBlock) HclBlock() *hclBlock {
+func (bb *BaseBlock) HclBlock() *HclBlock {
 	if bb.hb == nil {
-		return &hclBlock{
+		return &HclBlock{
 			Block: new(hclsyntax.Block),
 		}
 	}
@@ -359,5 +359,5 @@ func expandBlocks(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 }
 
 type DecodeBase interface {
-	Decode(*hclBlock, *hcl.EvalContext) error
+	Decode(*HclBlock, *hcl.EvalContext) error
 }

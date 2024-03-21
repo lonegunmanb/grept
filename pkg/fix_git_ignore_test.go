@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -29,8 +30,7 @@ func (s *gitIgnoreFixSuite) TestApplyGitIgnoreFix() {
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
 			c: func() Config {
-				cfg := NewGreptConfig()
-				cfg.SetBaseDir(".")
+				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 				return cfg
 			}(),
 		},
@@ -54,8 +54,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFixEnsureExist() {
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
 			c: func() Config {
-				cfg := NewGreptConfig()
-				cfg.SetBaseDir(".")
+				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 				return cfg
 			}(),
 		},
@@ -78,8 +77,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_NotExistWontRemoveComment() {
 content
 `})
 
-	cfg := NewGreptConfig()
-	cfg.SetBaseDir(".")
+	cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
 			c: cfg,
@@ -103,8 +101,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_TrimItem() {
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
 			c: func() Config {
-				cfg := NewGreptConfig()
-				cfg.SetBaseDir(".")
+				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 				return cfg
 			}(),
 		},
@@ -129,8 +126,7 @@ func (s *gitIgnoreFixSuite) TestGitIgnoreFix_GitIgnoreFileAbsent() {
 	gitIgnoreFix := &GitIgnoreFix{
 		BaseBlock: &BaseBlock{
 			c: func() Config {
-				cfg := NewGreptConfig()
-				cfg.SetBaseDir(".")
+				cfg := &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())}
 				return cfg
 			}(),
 		},

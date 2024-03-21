@@ -21,10 +21,7 @@ type IDag interface {
 type Config interface {
 	IDag
 	Context() context.Context
-	SetContext(context.Context)
-	SetBaseDir(string)
 	EvalContext() *hcl.EvalContext
-	IgnoreUnsupportedBlock() bool
 	setDag(*Dag)
 }
 
@@ -38,14 +35,6 @@ type BaseConfig struct {
 
 func (c *BaseConfig) Context() context.Context {
 	return c.ctx
-}
-
-func (c *BaseConfig) SetBaseDir(bd string) {
-	c.basedir = bd
-}
-
-func (c *BaseConfig) SetContext(ctx context.Context) {
-	c.ctx = ctx
 }
 
 func (c *BaseConfig) setDag(d *Dag) {
@@ -92,33 +81,19 @@ func (c *BaseConfig) EvalContext() *hcl.EvalContext {
 	return &ctx
 }
 
-func NewBasicConfig() *BaseConfig {
+func NewBasicConfig(basedir string, ctx context.Context) *BaseConfig {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	c := &BaseConfig{
-		ctx: context.TODO(),
+		basedir: basedir,
+		ctx:     ctx,
 	}
 	return c
 }
 
-func LoadConfig(cfg Config, baseDir, cfgDir string, ctx context.Context) (Config, error) {
+func InitConfig(config Config, hclBlocks []*HclBlock) error {
 	var err error
-	hclBlocks, err := loadHclBlocks(cfg, cfgDir)
-	if err != nil {
-		return nil, err
-	}
-
-	c, err := newConfig(cfg, baseDir, ctx, hclBlocks, err)
-	if err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
-func newConfig(config Config, baseDir string, ctx context.Context, hclBlocks []*hclBlock, err error) (Config, error) {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	config.SetBaseDir(baseDir)
-	config.SetContext(ctx)
 
 	var blocks []Block
 	for _, hb := range hclBlocks {
@@ -130,24 +105,24 @@ func newConfig(config Config, baseDir string, ctx context.Context, hclBlocks []*
 		blocks = append(blocks, b)
 	}
 	if err != nil {
-		return nil, err
+		return err
 	}
 	// If there's dag error, return dag error first.
 	dag, err := newDag(blocks)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	config.setDag(dag)
 	err = dag.runDag(config, tryEvalLocal)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	err = dag.runDag(config, expandBlocks)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return config, nil
+	return nil
 }
 
 func RunGreptPlan(c Config) (*GreptPlan, error) {
@@ -205,7 +180,7 @@ func planBlock(b Block) error {
 	return nil
 }
 
-func wrapBlock(c Config, hb *hclBlock) (Block, error) {
+func wrapBlock(c Config, hb *HclBlock) (Block, error) {
 	blockFactories := factories[hb.Type]
 	blockType := ""
 	if len(hb.Labels) > 0 {
@@ -218,7 +193,7 @@ func wrapBlock(c Config, hb *hclBlock) (Block, error) {
 	return f(c, hb), nil
 }
 
-func loadHclBlocks(c Config, dir string) ([]*hclBlock, error) {
+func loadGreptHclBlocks(ignoreUnsupportedBlock bool, dir string) ([]*HclBlock, error) {
 	fs := FsFactory()
 	matches, err := afero.Glob(fs, filepath.Join(dir, "*.grept.hcl"))
 	if err != nil {
@@ -228,7 +203,7 @@ func loadHclBlocks(c Config, dir string) ([]*hclBlock, error) {
 		return nil, fmt.Errorf("no `.grept.hcl` file found at %s", dir)
 	}
 
-	var blocks []*hclBlock
+	var blocks []*HclBlock
 
 	for _, filename := range matches {
 		content, fsErr := afero.ReadFile(fs, filename)
@@ -253,7 +228,7 @@ func loadHclBlocks(c Config, dir string) ([]*hclBlock, error) {
 		return nil, err
 	}
 
-	var r []*hclBlock
+	var r []*HclBlock
 
 	// First loop: parse all rule blocks
 	for _, b := range blocks {
@@ -261,7 +236,7 @@ func loadHclBlocks(c Config, dir string) ([]*hclBlock, error) {
 			r = append(r, b)
 			continue
 		}
-		if !c.IgnoreUnsupportedBlock() {
+		if !ignoreUnsupportedBlock {
 			err = multierror.Append(err, fmt.Errorf("invalid block type: %s %s", b.Type, b.Range().String()))
 		}
 	}

@@ -36,7 +36,7 @@ func planFunc() func(*cobra.Command, []string) error {
 		if err != nil {
 			return fmt.Errorf("error getting os wd: %+v", err)
 		}
-		config, err := pkg.LoadConfig(pkg.NewGreptConfig(), pwd, configPath, c.Context())
+		config, err := pkg.BuildGreptConfig(pwd, configPath, c.Context())
 		if err != nil {
 			return fmt.Errorf("error parsing config: %+v\n", err)
 		}

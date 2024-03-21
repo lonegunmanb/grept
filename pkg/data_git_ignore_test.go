@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -33,7 +34,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_Load() {
 	// create GitIgnoreDatasource instance and load .gitignore content
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 	}
 
@@ -52,7 +53,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_NoGitIgnoreFile() {
 	// create GitIgnoreDatasource instance and load .gitignore content
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 	}
 
@@ -67,7 +68,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_TabSpaceNewLine() {
 
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 	}
 	err := gitIgnore.ExecuteDuringPlan()
@@ -79,7 +80,7 @@ func (s *gitIgnoreSuite) TestGitIgnore_TabSpaceNewLine() {
 func (s *gitIgnoreSuite) TestGitIgnore_Value() {
 	gitIgnore := &GitIgnoreDatasource{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 		Records: []string{
 			".tfstate",

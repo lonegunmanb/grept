@@ -54,7 +54,7 @@ func (s *configSuite) TestParseConfig() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
 	t := s.T()
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
 	_, err = RunGreptPlan(config)
 	require.NoError(t, err)
@@ -86,7 +86,7 @@ func (s *configSuite) TestUnregisteredFix() {
 
 	t := s.T()
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hcl})
-	_, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	_, err := BuildGreptConfig("", "", nil)
 	require.NotNil(t, err)
 	expectedError := "unregistered fix: unregistered_fix"
 	assert.Contains(t, err.Error(), expectedError)
@@ -103,7 +103,7 @@ func (s *configSuite) TestUnregisteredRule() {
 
 	t := s.T()
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hcl})
-	_, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	_, err := BuildGreptConfig("", "", nil)
 	require.NotNil(t, err)
 
 	expectedError := "unregistered rule: unregistered_rule"
@@ -121,7 +121,7 @@ func (s *configSuite) TestInvalidBlockType() {
 
 	t := s.T()
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hcl})
-	_, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	_, err := BuildGreptConfig("", "", nil)
 	require.NotNil(t, err)
 
 	expectedError := "invalid block type: invalid_block"
@@ -144,7 +144,7 @@ func (s *configSuite) TestEvalContextRef() {
 `
 	t := s.T()
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hcl})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
 	_, err = RunGreptPlan(config)
 	require.NoError(t, err)
@@ -166,7 +166,7 @@ func (s *configSuite) TestFunctionInEvalContext() {
 	`, fileContent)
 	s.dummyFsWithFiles([]string{"/testfile", "test.grept.hcl"}, []string{fileContent, configStr})
 
-	config, err := LoadConfig(NewGreptConfig(), "/", ".", nil)
+	config, err := BuildGreptConfig("/", ".", nil)
 	require.NoError(t, err)
 	_, err = RunGreptPlan(config)
 	require.NoError(t, err)
@@ -195,7 +195,7 @@ func (s *configSuite) TestFunctionInEvalContext() {
 //
 //	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 //
-//	config, err := LoadConfig("", "", nil)
+//	config, err := BuildGreptConfig("", "", nil)
 //	s.NoError(err)
 //
 //	s.Len(config.RuleBlocks(), 3)
@@ -218,8 +218,8 @@ func (s *configSuite) TestParseConfigHttpBlock() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
 	// Parse the configuration
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
-	require.NoError(t, err, "LoadConfig should not return an error")
+	config, err := BuildGreptConfig("", "", nil)
+	require.NoError(t, err, "BuildGreptConfig should not return an error")
 	_, err = RunGreptPlan(config)
 	require.NoError(t, err)
 	// ExecuteDuringPlan the parsed configuration
@@ -254,7 +254,7 @@ func (s *configSuite) TestPlanError_DatasourceError() {
 `, server.URL)
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 	// Parse the config
-	c, err := LoadConfig(NewGreptConfig(), "", "", context.TODO())
+	c, err := BuildGreptConfig("", "", context.TODO())
 	require.Nil(t, err)
 	_, err = RunGreptPlan(c)
 	require.NotNil(t, err)
@@ -284,7 +284,7 @@ func (s *configSuite) TestPlanError_FileHashRuleError() {
 	`, server.URL)
 	s.dummyFsWithFiles([]string{"/testfile", "test.grept.hcl"}, []string{"Different content", sampleConfig})
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	config, err := BuildGreptConfig("/", "", nil)
 	require.NoError(t, err)
 
 	//config.ctx = context.TODO()
@@ -317,7 +317,7 @@ func (s *configSuite) TestPlanSuccess_FileHashRuleSuccess() {
 	`, server.URL)
 	s.dummyFsWithFiles([]string{"/testfile", "test.grept.hcl"}, []string{expectedContent, sampleConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	config, err := BuildGreptConfig("/", "", nil)
 	require.NoError(t, err)
 
 	//config.ctx = context.TODO()
@@ -346,7 +346,7 @@ func (s *configSuite) TestApplyPlan_multiple_file_fix() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl", "/example/sub1/testfile", "/example/sub2/testfile"}, []string{content, "world", "world"})
 
-	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	config, err := BuildGreptConfig("/", "", nil)
 	require.NoError(t, err)
 
 	plan, err := RunGreptPlan(config)
@@ -378,7 +378,7 @@ rule must_be_true test {
 `
 
 	s.dummyFsWithFiles([]string{"/test.grept.hcl"}, []string{hcl})
-	c, err := LoadConfig(NewGreptConfig(), "", "/", context.TODO())
+	c, err := BuildGreptConfig("", "/", context.TODO())
 	assert.NoError(t, err)
 	_, err = RunGreptPlan(c)
 	require.NoError(t, err)
@@ -436,7 +436,7 @@ func (s *configSuite) TestHttpDatasource_DefaultMethodShouldBeGet() {
 			require.False(s.T(), diag.HasErrors())
 			h := &HttpDatasource{
 				BaseBlock: &BaseBlock{
-					hb: &hclBlock{
+					hb: &HclBlock{
 						Block: config.Body.(*hclsyntax.Body).Blocks[0],
 					},
 				},
@@ -466,7 +466,7 @@ func (s *configSuite) TestAnyRuleFailShouldTriggerFix() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
 	// Parse the configuration
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	plan, err := RunGreptPlan(config)
 	s.NoError(err)
@@ -495,7 +495,7 @@ func (s *configSuite) TestMultipleRulesTriggerSameFixShouldExecuteOnlyOnce() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
 	// Parse the configuration
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	plan, err := RunGreptPlan(config)
 	s.NoError(err)
@@ -503,7 +503,7 @@ func (s *configSuite) TestMultipleRulesTriggerSameFixShouldExecuteOnlyOnce() {
 }
 
 func (s *configSuite) TestEmptyConfigFolderShouldThrowError() {
-	_, err := LoadConfig(NewGreptConfig(), "/", "/", context.TODO())
+	_, err := BuildGreptConfig("/", "/", context.TODO())
 	s.NotNil(err)
 	s.Contains(err.Error(), "no `.grept.hcl` file found")
 }
@@ -527,7 +527,7 @@ func (s *configSuite) TestParseConfigBeforePlan_UnknownValueShouldNotTriggerErro
 	`, server.URL)
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
-	_, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	_, err := BuildGreptConfig("/", "", nil)
 	require.NoError(t, err)
 }
 
@@ -539,7 +539,7 @@ locals {
 }
 `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{code})
-	c, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	c, err := BuildGreptConfig("/", "", nil)
 	s.NoError(err)
 	locals := Blocks[Local](c)
 	s.Len(locals, 2)
@@ -565,7 +565,7 @@ func (s *configSuite) TestLocalWithRuleAndFix() {
 `
 	t := s.T()
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hcl})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
 	_, err = RunGreptPlan(config)
 	require.NoError(t, err)
@@ -597,7 +597,7 @@ func (s *configSuite) TestLocalBetweenDataAndRule() {
 	`, server.URL)
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
-	c, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	c, err := BuildGreptConfig("/", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(c)
 	s.NoError(err)
@@ -618,7 +618,7 @@ func (s *configSuite) TestForEach_ForEachBlockShouldBeExpanded() {
 `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	s.Len(Blocks[Data](config), 3)
 }
@@ -642,7 +642,7 @@ func (s *configSuite) TestForEachAndAddressIndex() {
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(s.T(), err)
 
 	p, err := RunGreptPlan(config)
@@ -709,7 +709,7 @@ func (s *configSuite) TestForEach_from_data_to_fix() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(s.T(), err)
 
 	p, err := RunGreptPlan(config)
@@ -736,7 +736,7 @@ func (s *configSuite) TestForEach_forEachAsToggle() {
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(s.T(), err)
 	s.Len(Blocks[Rule](config), 0)
 }
@@ -754,7 +754,7 @@ func (s *configSuite) TestForEach_blocksWithIndexShouldHasNewBlockId() {
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{hclConfig})
 
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(s.T(), err)
 	rules := Blocks[Rule](config)
 	s.Len(rules, 2)
@@ -781,7 +781,7 @@ func (s *configSuite) TestPlanOnlyAddFixWhenCheckErrNotNil() {
 	`
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
 	plan, err := RunGreptPlan(config)
 	require.NoError(t, err)
@@ -807,7 +807,7 @@ func (s *configSuite) TestApplyPlan_file_fix_with_null_mode() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl", "/example/testfile"}, []string{content, "world"})
 
-	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	config, err := BuildGreptConfig("/", "", nil)
 	require.NoError(t, err)
 
 	plan, err := RunGreptPlan(config)

@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -40,7 +41,7 @@ func (s *httpDataSuite) TestHttpDatasource_Load() {
 	// Create a HttpDatasource instance
 	h := &HttpDatasource{
 		BaseBlock: &BaseBlock{
-			c:    NewGreptConfig(),
+			c:    &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 			name: "test",
 		},
 		Url:    ts.URL,
@@ -71,7 +72,7 @@ func (s *httpDataSuite) TestHttpDatasource_InvalidMethod() {
 
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
 
-	config, err := LoadConfig(NewGreptConfig(), "/", "", nil)
+	config, err := BuildGreptConfig("/", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NotNil(err)

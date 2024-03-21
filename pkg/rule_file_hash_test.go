@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"crypto/md5"
 	"crypto/sha1"
 	"fmt"
@@ -156,7 +157,7 @@ func (s *fileHashRuleSuite) TestFileHashRule_HashMismatchFilesShouldBeExported()
 	_ = afero.WriteFile(fs, filename, []byte("test content"), 0644)
 	rule := &FileHashRule{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 		BaseRule: new(BaseRule),
 		Glob:     "/example/*/testfile.txt",

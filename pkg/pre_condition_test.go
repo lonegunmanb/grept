@@ -39,7 +39,7 @@ func (s *preConditionSuite) TestPreCondition_PassedHardcodedCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NoError(err)
@@ -65,7 +65,7 @@ func (s *preConditionSuite) TestPreCondition_FaileddHardcodedConditionShouldFail
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NotNil(err)
@@ -85,7 +85,7 @@ func (s *preConditionSuite) TestPreCondition_FaileddHardcodedCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NotNil(err)
@@ -114,7 +114,7 @@ func (s *preConditionSuite) TestPreCondition_FunctionCallInCondition() {
     }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NotNil(err)
@@ -138,7 +138,7 @@ func (s *preConditionSuite) TestMultiplePreConditions_containFailedCheck() {
         }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NotNil(err)
@@ -161,7 +161,7 @@ func (s *preConditionSuite) TestMultiplePreConditions_allPassedCheck() {
         }
     `
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{content})
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 	_, err = RunGreptPlan(config)
 	s.NoError(err)
@@ -189,7 +189,7 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttribute() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
@@ -219,7 +219,7 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeFailedCheck
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
@@ -260,7 +260,7 @@ func (s *preConditionSuite) TestPreCondition_ReferMultipleBlockAttributes() {
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
@@ -301,7 +301,7 @@ func (s *preConditionSuite) TestPreCondition_ReferMultipleBlockAttributesFailedC
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
@@ -341,7 +341,7 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeWithForEach
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration
@@ -381,7 +381,7 @@ func (s *preConditionSuite) TestPreCondition_ReferOtherBlockAttributeWithForEach
 	s.dummyFsWithFiles([]string{"test.grept.hcl"}, []string{sampleConfig})
 
 	// Parse the config
-	config, err := LoadConfig(NewGreptConfig(), "", "", nil)
+	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
 
 	// Plan the parsed configuration

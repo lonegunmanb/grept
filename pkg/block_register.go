@@ -10,7 +10,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-type blockConstructor = func(Config, *hclBlock) Block
+type blockConstructor = func(Config, *HclBlock) Block
 type blockRegistry map[string]blockConstructor
 
 var validBlockTypes sets.Set = hashset.New()
@@ -37,7 +37,7 @@ func RegisterBlock(t Block) {
 		refIters[bt] = iterator(bt, t.AddressLength())
 	}
 	validBlockTypes.Add(bt)
-	registry[t.Type()] = func(c Config, hb *hclBlock) Block {
+	registry[t.Type()] = func(c Config, hb *HclBlock) Block {
 		newBlock := reflect.New(reflect.TypeOf(t).Elem()).Elem()
 		newBaseBlock := newBaseBlock(c, hb)
 		newBaseBlock.setForEach(hb.forEach)

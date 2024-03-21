@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,7 @@ func (s *fixRmLocalFileSuite) TestRemoveFile_FileExist() {
 	fileName := tmpFile.Name()
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 		Paths: []string{fileName},
 	}
@@ -52,7 +53,7 @@ func (s *fixRmLocalFileSuite) TestRemoveFile_FileNotExist() {
 	fileName := "/path/to/not-exist-file"
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 		Paths: []string{fileName},
 	}
@@ -72,7 +73,7 @@ func TestRemoveFile_RemoveFolder(t *testing.T) {
 	require.NoError(t, err)
 	rf := &RmLocalFileFix{
 		BaseBlock: &BaseBlock{
-			c: NewGreptConfig(),
+			c: &GreptConfig{BaseConfig: NewBasicConfig(".", context.TODO())},
 		},
 		Paths: []string{tmpDir},
 	}

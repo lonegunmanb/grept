@@ -23,7 +23,7 @@ type BaseFix struct {
 
 func (bf *BaseFix) Fix() {}
 
-func (bf *BaseFix) Decode(hb *hclBlock, evalContext *hcl.EvalContext) error {
+func (bf *BaseFix) Decode(hb *HclBlock, evalContext *hcl.EvalContext) error {
 	ruleIds, diag := hb.Body.Attributes["rule_ids"].Expr.Value(evalContext)
 	if diag.HasErrors() {
 		return diag
