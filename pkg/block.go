@@ -1,13 +1,10 @@
 package pkg
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/emirpasic/gods/queues/linkedlistqueue"
 	"github.com/emirpasic/gods/sets/hashset"
-	"github.com/google/uuid"
-	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -25,6 +22,7 @@ type Block interface {
 	Name() string
 	Type() string
 	BlockType() string
+	Address() string
 	HclBlock() *HclBlock
 	EvalContext() *hcl.EvalContext
 	BaseValues() map[string]cty.Value
@@ -47,7 +45,7 @@ var metaNestedBlockNames = hashset.New("precondition")
 func decode(b Block) error {
 	hb := b.HclBlock()
 	evalContext := b.EvalContext()
-	if decodeBase, ok := b.(DecodeBase); ok {
+	if decodeBase, ok := b.(CustomDecodeBase); ok {
 		err := decodeBase.Decode(hb, evalContext)
 		if err != nil {
 			return err
@@ -173,125 +171,8 @@ func blockAddress(b *HclBlock) string {
 	return sb.String()
 }
 
-type BaseBlock struct {
-	c             Config
-	hb            *HclBlock
-	name          string
-	id            string
-	blockAddress  string
-	forEach       *forEach
-	preConditions []PreCondition
-}
-
-func newBaseBlock(c Config, hb *HclBlock) *BaseBlock {
-	bb := &BaseBlock{
-		c:            c,
-		hb:           hb,
-		blockAddress: blockAddress(hb),
-		name:         hb.Labels[1],
-		id:           uuid.NewString(),
-	}
-	return bb
-}
-
-func (bb *BaseBlock) Id() string {
-	return bb.id
-}
-
-func (bb *BaseBlock) Name() string {
-	return bb.name
-}
-
-func (bb *BaseBlock) HclBlock() *HclBlock {
-	if bb.hb == nil {
-		return &HclBlock{
-			Block: new(hclsyntax.Block),
-		}
-	}
-	return bb.hb
-}
-
-func (bb *BaseBlock) BaseValues() map[string]cty.Value {
-	return map[string]cty.Value{
-		"id": cty.StringVal(bb.id),
-	}
-}
-
-func (bb *BaseBlock) EvalContext() *hcl.EvalContext {
-	var ctx *hcl.EvalContext
-	if bb.c == nil {
-		ctx = new(hcl.EvalContext)
-	} else {
-		ctx = bb.c.EvalContext()
-	}
-	if bb.forEach != nil {
-		ctx = ctx.NewChild()
-		ctx.Variables = map[string]cty.Value{
-			"each": cty.ObjectVal(map[string]cty.Value{
-				"key":   cty.StringVal(CtyValueToString(bb.forEach.key)),
-				"value": bb.forEach.value,
-			}),
-		}
-	}
-	return ctx
-}
-
-func (bb *BaseBlock) Context() context.Context {
-	if bb.c == nil {
-		return context.TODO()
-	}
-	return bb.c.Context()
-}
-
-func (bb *BaseBlock) PreConditionCheck(ctx *hcl.EvalContext) ([]PreCondition, error) {
-	var failedChecks []PreCondition
-	var err error
-	for _, cond := range bb.preConditions {
-		diag := gohcl.DecodeBody(cond.Body, ctx, &cond)
-		if diag.HasErrors() {
-			err = multierror.Append(err, diag.Errs()...)
-			continue
-		}
-		if !cond.Condition {
-			failedChecks = append(failedChecks, cond)
-		}
-	}
-	return failedChecks, err
-}
-
-func (bb *BaseBlock) forEachDefined() bool {
-	_, forEach := bb.HclBlock().Body.Attributes["for_each"]
-	return forEach
-}
-
-func (bb *BaseBlock) getDownstreams() []Block {
-	var blocks []Block
-	children, _ := bb.c.Dag().GetChildren(bb.blockAddress)
-	for _, c := range children {
-		blocks = append(blocks, c.(Block))
-	}
-	return blocks
-}
-
-func (bb *BaseBlock) setForEach(each *forEach) {
-	bb.forEach = each
-}
-func (bb *BaseBlock) getForEach() *forEach {
-	return bb.forEach
-}
-
-func (bb *BaseBlock) setMetaNestedBlock() {
-	for _, nb := range bb.hb.Block.Body.Blocks {
-		if nb.Type == "precondition" {
-			bb.preConditions = append(bb.preConditions, PreCondition{
-				Body: nb.Body,
-			})
-		}
-	}
-}
-
 func plan(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
-	self, _ := dag.GetVertex(blockAddress(b.HclBlock()))
+	self, _ := dag.GetVertex(b.Address())
 	return planBlock(self.(Block))
 }
 
@@ -319,7 +200,7 @@ func expandBlocks(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 	if !forEachValue.CanIterateElements() {
 		return fmt.Errorf("invalid `for_each`, except set or map: %s", attr.Range().String())
 	}
-	address := blockAddress(b.HclBlock())
+	address := b.Address()
 	upstreams, err := dag.GetAncestors(address)
 	if err != nil {
 		return err
@@ -356,8 +237,4 @@ func expandBlocks(c Config, dag *Dag, q *linkedlistqueue.Queue, b Block) error {
 		q.Enqueue(nb)
 	}
 	return dag.DeleteVertex(address)
-}
-
-type DecodeBase interface {
-	Decode(*HclBlock, *hcl.EvalContext) error
 }

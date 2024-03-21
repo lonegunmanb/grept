@@ -24,7 +24,7 @@ func (d dagWalker) Enter(node hclsyntax.Node) hcl.Diagnostics {
 					continue
 				}
 				for _, src := range refIter(traversal, i) {
-					dest := blockAddress(d.rootBlock.HclBlock())
+					dest := d.rootBlock.Address()
 					dests, err := d.dag.GetChildren(src)
 					if err != nil {
 						continue

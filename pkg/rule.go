@@ -1,7 +1,7 @@
 package pkg
 
 type Rule interface {
-	Block
+	PlanBlock
 	CheckError() error
 	// discriminator func
 	Rule()

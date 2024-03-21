@@ -1,7 +1,7 @@
 package pkg
 
 type Data interface {
-	Block
+	PlanBlock
 	// discriminator func
 	Data()
 }

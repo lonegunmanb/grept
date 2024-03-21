@@ -3,8 +3,6 @@ package pkg
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
-	"strings"
-	"sync"
 )
 
 type Plan interface {
@@ -12,74 +10,31 @@ type Plan interface {
 	Apply() error
 }
 
-var _ Plan = &GreptPlan{}
-
-type GreptPlan struct {
-	FailedRules []*FailedRule
-	Fixes       map[string]Fix
-	mu          sync.Mutex
-}
-
-func newPlan() *GreptPlan {
-	return &GreptPlan{
-		Fixes: make(map[string]Fix),
+func planBlock(b Block) error {
+	decodeErr := decode(b)
+	if decodeErr != nil {
+		return fmt.Errorf("%s.%s.%s(%s) decode error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), decodeErr)
 	}
-}
-
-func (p *GreptPlan) String() string {
-	sb := strings.Builder{}
-	for _, r := range p.FailedRules {
-		sb.WriteString(r.String())
-		sb.WriteString("\n---\n")
+	if validateErr := Validate.Struct(b); validateErr != nil {
+		return fmt.Errorf("%s.%s.%s is not valid: %s", b.BlockType(), b.Type(), b.Name(), validateErr.Error())
 	}
-	for _, f := range p.Fixes {
-		sb.WriteString(fmt.Sprintf("%s would be apply:\n %s\n", blockAddress(f.HclBlock()), blockToString(f)))
-		sb.WriteString("\n---\n")
+	failedChecks, preConditionCheckError := b.PreConditionCheck(b.EvalContext())
+	if preConditionCheckError != nil {
+		return preConditionCheckError
 	}
-
-	return sb.String()
-}
-
-func (p *GreptPlan) Apply() error {
-	var err error
-	for _, fix := range p.Fixes {
-		if err = decode(fix); err != nil {
-			err = multierror.Append(err, fmt.Errorf("rule.%s.%s(%s) decode error: %+v", fix.Type(), fix.Name(), fix.HclBlock().Range().String(), err))
+	if len(failedChecks) > 0 {
+		var err error
+		for _, c := range failedChecks {
+			err = multierror.Append(err, fmt.Errorf("precondition check error: %s, %s", c.ErrorMessage, c.Body.Range().String()))
 		}
-		if err != nil {
-			return err
-		}
+		return err
 	}
-
-	for _, fix := range p.Fixes {
-		if applyErr := fix.Apply(); applyErr != nil {
-			err = multierror.Append(err, applyErr)
+	pa, ok := b.(PlanBlock)
+	if ok {
+		execErr := pa.ExecuteDuringPlan()
+		if execErr != nil {
+			return fmt.Errorf("%s.%s.%s(%s) exec error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), execErr)
 		}
-	}
-	if err != nil {
-		return fmt.Errorf("errors applying fixes: %+v", err)
 	}
 	return nil
-}
-
-func (p *GreptPlan) addRule(fr *FailedRule) {
-	p.mu.Lock()
-	p.FailedRules = append(p.FailedRules, fr)
-	p.mu.Unlock()
-}
-
-func (p *GreptPlan) addFix(f Fix) {
-	p.mu.Lock()
-	p.Fixes[f.Id()] = f
-	p.mu.Unlock()
-}
-
-type FailedRule struct {
-	Rule
-	CheckError error
-}
-
-func (fr *FailedRule) String() string {
-	address := blockAddress(fr.HclBlock())
-	return fmt.Sprintf("%s check return failure: %s", address, fr.CheckError.Error())
 }

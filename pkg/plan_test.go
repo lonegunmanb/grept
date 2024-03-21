@@ -20,8 +20,9 @@ func TestPlan_String(t *testing.T) {
 					{
 						Rule: &FileHashRule{
 							BaseBlock: &BaseBlock{
-								name: "test-rule",
-								id:   "1",
+								blockAddress: "rule.file_hash.test-rule",
+								name:         "test-rule",
+								id:           "1",
 								hb: newHclBlock(&hclsyntax.Block{
 									Type:   "rule",
 									Labels: []string{"file_hash", "test-rule"},
@@ -37,7 +38,8 @@ func TestPlan_String(t *testing.T) {
 				Fixes: map[string]Fix{
 					"test_id": &LocalFileFix{
 						BaseBlock: &BaseBlock{
-							name: "test-fix",
+							name:         "test-fix",
+							blockAddress: "fix.local_file.test-fix",
 							hb: newHclBlock(&hclsyntax.Block{
 								Type:   "fix",
 								Labels: []string{"local_file", "test-fix"},

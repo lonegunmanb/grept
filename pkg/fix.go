@@ -6,16 +6,15 @@ import (
 )
 
 type Fix interface {
-	Block
+	ApplyBlock
 	GetRuleIds() []string
-	Apply() error
 	// discriminator func
 	Fix()
 	setRuleIds([]string)
 }
 
 var _ Valuable = &BaseFix{}
-var _ DecodeBase = &BaseFix{}
+var _ CustomDecodeBase = &BaseFix{}
 
 type BaseFix struct {
 	RuleIds []string `json:"rule_ids" hcl:"rule_ids"`

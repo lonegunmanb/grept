@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ahmetb/go-linq/v3"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/lonegunmanb/hclfuncs"
 	"github.com/spf13/afero"
-	"github.com/zclconf/go-cty/cty"
 )
 
 type IDag interface {
@@ -22,23 +19,6 @@ type Config interface {
 	IDag
 	Context() context.Context
 	EvalContext() *hcl.EvalContext
-	setDag(*Dag)
-}
-
-var _ Config = &GreptConfig{}
-
-type BaseConfig struct {
-	ctx     context.Context
-	basedir string
-	dag     *Dag
-}
-
-func (c *BaseConfig) Context() context.Context {
-	return c.ctx
-}
-
-func (c *BaseConfig) setDag(d *Dag) {
-	c.dag = d
 }
 
 func Blocks[T Block](c IDag) []T {
@@ -50,47 +30,6 @@ func Blocks[T Block](c IDag) []T {
 		}
 	}
 	return r
-}
-
-func (c *BaseConfig) Dag() *Dag {
-	return c.dag
-}
-
-func (c *BaseConfig) blocksByTypes() map[string][]Block {
-	r := make(map[string][]Block)
-	for _, b := range blocks(c) {
-		bt := b.BlockType()
-		r[bt] = append(r[bt], b)
-	}
-	return r
-}
-
-func (c *BaseConfig) EvalContext() *hcl.EvalContext {
-	ctx := hcl.EvalContext{
-		Functions: hclfuncs.Functions(c.basedir),
-		Variables: make(map[string]cty.Value),
-	}
-	for bt, bs := range c.blocksByTypes() {
-		sample := bs[0]
-		if _, ok := sample.(SingleValueBlock); ok {
-			ctx.Variables[bt] = SingleValues(castBlock[SingleValueBlock](bs))
-			continue
-		}
-		ctx.Variables[bt] = Values(bs)
-	}
-	return &ctx
-}
-
-func NewBasicConfig(basedir string, ctx context.Context) *BaseConfig {
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	c := &BaseConfig{
-		basedir: basedir,
-		ctx:     ctx,
-		dag:     newDag(),
-	}
-	return c
 }
 
 func InitConfig(config Config, hclBlocks []*HclBlock) error {
@@ -122,61 +61,6 @@ func InitConfig(config Config, hclBlocks []*HclBlock) error {
 		return err
 	}
 
-	return nil
-}
-
-func RunGreptPlan(c Config) (*GreptPlan, error) {
-	err := c.Dag().runDag(c, plan)
-	if err != nil {
-		return nil, err
-	}
-
-	plan := newPlan()
-	for _, rb := range Blocks[Rule](c) {
-		checkErr := rb.CheckError()
-		if checkErr == nil {
-			continue
-		}
-		plan.addRule(&FailedRule{
-			Rule:       rb,
-			CheckError: checkErr,
-		})
-		for _, fb := range Blocks[Fix](c) {
-			if linq.From(fb.GetRuleIds()).Contains(rb.Id()) {
-				plan.addFix(fb)
-			}
-		}
-	}
-
-	return plan, nil
-}
-
-func planBlock(b Block) error {
-	decodeErr := decode(b)
-	if decodeErr != nil {
-		return fmt.Errorf("%s.%s.%s(%s) decode error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), decodeErr)
-	}
-	if validateErr := Validate.Struct(b); validateErr != nil {
-		return fmt.Errorf("%s.%s.%s is not valid: %s", b.BlockType(), b.Type(), b.Name(), validateErr.Error())
-	}
-	failedChecks, preConditionCheckError := b.PreConditionCheck(b.EvalContext())
-	if preConditionCheckError != nil {
-		return preConditionCheckError
-	}
-	if len(failedChecks) > 0 {
-		var err error
-		for _, c := range failedChecks {
-			err = multierror.Append(err, fmt.Errorf("precondition check error: %s, %s", c.ErrorMessage, c.Body.Range().String()))
-		}
-		return err
-	}
-	pa, ok := b.(PlanBlock)
-	if ok {
-		execErr := pa.ExecuteDuringPlan()
-		if execErr != nil {
-			return fmt.Errorf("%s.%s.%s(%s) exec error: %+v", b.Type(), b.Type(), b.Name(), b.HclBlock().Range().String(), execErr)
-		}
-	}
 	return nil
 }
 

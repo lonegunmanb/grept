@@ -22,13 +22,9 @@ func newDag() *Dag {
 }
 
 func (d *Dag) buildDag(blocks []Block) error {
-	//g := &Dag{
-	//	DAG:              dag.NewDAG(),
-	//	pendingUpstreams: make(map[string]sets.Set),
-	//}
 	var walkErr error
 	for _, b := range blocks {
-		err := d.AddVertexByID(blockAddress(b.HclBlock()), b)
+		err := d.AddVertexByID(b.Address(), b)
 		if err != nil {
 			walkErr = multierror.Append(walkErr, err)
 		}
@@ -67,7 +63,7 @@ func (d *Dag) runDag(c Config, onReady func(Config, *Dag, *linkedlistqueue.Queue
 		next, _ := pending.Dequeue()
 		b := next.(Block)
 		// the node has already been expanded and deleted from dag
-		address := blockAddress(b.HclBlock())
+		address := b.Address()
 		exist := d.exist(address)
 		if !exist {
 			continue

@@ -2,6 +2,8 @@ package pkg
 
 import "context"
 
+var _ Config = &GreptConfig{}
+
 type GreptConfig struct {
 	*BaseConfig
 }
