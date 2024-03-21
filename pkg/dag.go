@@ -14,25 +14,32 @@ type Dag struct {
 	pendingUpstreams map[string]sets.Set
 }
 
-func newDag(blocks []Block) (*Dag, error) {
-	g := &Dag{
+func newDag() *Dag {
+	return &Dag{
 		DAG:              dag.NewDAG(),
 		pendingUpstreams: make(map[string]sets.Set),
 	}
+}
+
+func (d *Dag) buildDag(blocks []Block) error {
+	//g := &Dag{
+	//	DAG:              dag.NewDAG(),
+	//	pendingUpstreams: make(map[string]sets.Set),
+	//}
 	var walkErr error
 	for _, b := range blocks {
-		err := g.AddVertexByID(blockAddress(b.HclBlock()), b)
+		err := d.AddVertexByID(blockAddress(b.HclBlock()), b)
 		if err != nil {
 			walkErr = multierror.Append(walkErr, err)
 		}
 	}
 	for _, b := range blocks {
-		diag := hclsyntax.Walk(b.HclBlock().Body, dagWalker{dag: g, rootBlock: b})
+		diag := hclsyntax.Walk(b.HclBlock().Body, dagWalker{dag: d, rootBlock: b})
 		if diag.HasErrors() {
 			walkErr = multierror.Append(walkErr, diag.Errs()...)
 		}
 	}
-	return g, walkErr
+	return walkErr
 }
 
 func (d *Dag) addEdge(from, to string) error {

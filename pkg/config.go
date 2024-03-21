@@ -88,6 +88,7 @@ func NewBasicConfig(basedir string, ctx context.Context) *BaseConfig {
 	c := &BaseConfig{
 		basedir: basedir,
 		ctx:     ctx,
+		dag:     newDag(),
 	}
 	return c
 }
@@ -108,16 +109,15 @@ func InitConfig(config Config, hclBlocks []*HclBlock) error {
 		return err
 	}
 	// If there's dag error, return dag error first.
-	dag, err := newDag(blocks)
+	err = config.Dag().buildDag(blocks)
 	if err != nil {
 		return err
 	}
-	config.setDag(dag)
-	err = dag.runDag(config, tryEvalLocal)
+	err = config.Dag().runDag(config, tryEvalLocal)
 	if err != nil {
 		return err
 	}
-	err = dag.runDag(config, expandBlocks)
+	err = config.Dag().runDag(config, expandBlocks)
 	if err != nil {
 		return err
 	}

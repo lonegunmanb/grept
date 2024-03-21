@@ -57,7 +57,8 @@ func (s *dagSuite) TestDag_DagVertex() {
 
 	config, err := BuildGreptConfig("", "", nil)
 	s.NoError(err)
-	d, err := newDag(blocks(config))
+	d := newDag()
+	err = d.buildDag(blocks(config))
 	s.NoError(err)
 	s.Len(d.GetVertices(), 3)
 
@@ -90,7 +91,8 @@ func (s *dagSuite) TestDag_DagBlocksShouldBeConnectedWithEdgeIfThereIsReferenceB
 
 	config, err := BuildGreptConfig("", "", nil)
 	require.NoError(t, err)
-	dag, err := newDag(blocks(config))
+	dag := newDag()
+	err = dag.buildDag(blocks(config))
 	require.NoError(t, err)
 	assert.Equal(t, 2, dag.GetSize())
 	roots := dag.GetRoots()
