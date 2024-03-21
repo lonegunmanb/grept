@@ -30,7 +30,7 @@ func (d *Dag) buildDag(blocks []Block) error {
 		}
 	}
 	for _, b := range blocks {
-		diag := hclsyntax.Walk(b.HclBlock().Body, dagWalker{dag: d, rootBlock: b})
+		diag := hclsyntax.Walk(b.HclBlock().Body, newDagWalker(d, b.Address()))
 		if diag.HasErrors() {
 			walkErr = multierror.Append(walkErr, diag.Errs()...)
 		}

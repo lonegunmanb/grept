@@ -8,8 +8,15 @@ import (
 var _ hclsyntax.Walker = dagWalker{}
 
 type dagWalker struct {
-	dag       *Dag
-	rootBlock Block
+	dag          *Dag
+	startAddress string
+}
+
+func newDagWalker(d *Dag, startAddress string) dagWalker {
+	return dagWalker{
+		dag:          d,
+		startAddress: startAddress,
+	}
 }
 
 func (d dagWalker) Enter(node hclsyntax.Node) hcl.Diagnostics {
@@ -24,7 +31,7 @@ func (d dagWalker) Enter(node hclsyntax.Node) hcl.Diagnostics {
 					continue
 				}
 				for _, src := range refIter(traversal, i) {
-					dest := d.rootBlock.Address()
+					dest := d.startAddress
 					dests, err := d.dag.GetChildren(src)
 					if err != nil {
 						continue
