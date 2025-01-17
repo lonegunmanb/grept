@@ -31,6 +31,7 @@ func registerFix() {
 	golden.RegisterBlock(new(GitHubTeamFix))
 	golden.RegisterBlock(new(GitHubTeamMembersFix))
 	golden.RegisterBlock(new(GitHubTeamRepositoryFix))
+	golden.RegisterBlock(new(GitHubRepositoryOidcSubjectClaimFix))
 }
 
 func registerRule() {
@@ -47,4 +48,5 @@ func registerData() {
 	golden.RegisterBlock(new(GitHubRepositoryEnvironmentsDatasource))
 	golden.RegisterBlock(new(GitHubRepositoryTeamsDatasource))
 	golden.RegisterBlock(new(GitHubTeamDatasource))
+	golden.RegisterBlock(new(GitHubRepositoryOidcSubjectClaimDatasource))
 }

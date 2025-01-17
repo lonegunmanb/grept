@@ -180,3 +180,6 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 mock_*.go
+
+# VS Code customization
+.vscode/launch.json
